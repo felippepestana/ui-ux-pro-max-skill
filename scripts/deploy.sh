@@ -142,6 +142,11 @@ setup_ssl() {
 
     log_warn "Obtendo certificado SSL para $DOMAIN..."
 
+    # Stop Nginx if running to free port 80 for standalone mode
+    cd "$APP_HOME"
+    docker-compose stop nginx || true
+    sleep 2
+
     if command -v certbot &> /dev/null; then
         sudo certbot certonly --standalone \
             -d "$DOMAIN" \
@@ -149,10 +154,10 @@ setup_ssl() {
             --no-eff-email \
             --email admin@"$DOMAIN"
 
-        # Copiar certificados
-        sudo cp /etc/letsencrypt/live/"$DOMAIN"/fullchain.pem "$APP_HOME/ssl/cert.pem"
-        sudo cp /etc/letsencrypt/live/"$DOMAIN"/privkey.pem "$APP_HOME/ssl/key.pem"
-        sudo chown $(whoami):$(whoami) "$APP_HOME/ssl"/*
+        # Symlink certificados para garantir auto-renewal
+        sudo ln -sf /etc/letsencrypt/live/"$DOMAIN"/fullchain.pem "$APP_HOME/ssl/cert.pem"
+        sudo ln -sf /etc/letsencrypt/live/"$DOMAIN"/privkey.pem "$APP_HOME/ssl/key.pem"
+        sudo chown -h $(whoami):$(whoami) "$APP_HOME/ssl"/*
 
         log_info "Certificados SSL configurados"
     else

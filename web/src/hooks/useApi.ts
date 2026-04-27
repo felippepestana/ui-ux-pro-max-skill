@@ -20,26 +20,31 @@ export function useApi<T>(
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchData = async () => {
+  const fetchData = async (signal?: AbortSignal) => {
     try {
       setLoading(true)
       setError(null)
-      const response = await fetch(url)
+      const response = await fetch(url, { signal })
       if (!response.ok) throw new Error(`HTTP ${response.status}`)
       const result = await response.json()
       setData(result)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error')
+      if (err instanceof Error && err.name !== 'AbortError') {
+        setError(err.message)
+      }
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    fetchData()
+    const controller = new AbortController()
+    fetchData(controller.signal)
+    return () => controller.abort()
   }, options.dependencies || [url])
 
-  return { data, loading, error, refetch: fetchData }
+  const refetch = () => fetchData()
+  return { data, loading, error, refetch }
 }
 
 export function useApiPost<T>(

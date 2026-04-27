@@ -8,6 +8,7 @@ import json
 import csv
 import os
 import sys
+from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Any
 from flask import Flask, jsonify, request, send_from_directory
@@ -166,6 +167,7 @@ def generate_system():
 
     query = custom_query or product_type
     design_system = generate_design_system(query, product_name)
+    design_system['generatedAt'] = datetime.now().isoformat()
 
     return jsonify(design_system)
 
@@ -180,7 +182,7 @@ def export_code():
     exported = {
         'format': format_type,
         'stack': stack,
-        'generated_at': str(Path('').resolve()),
+        'generatedAt': datetime.now().isoformat(),
         'design_system': design_system
     }
 
@@ -242,6 +244,8 @@ def index():
 @app.get('/<path:path>')
 def serve_static(path):
     """Serve arquivos estáticos do frontend"""
+    if path.startswith('api/'):
+        return jsonify({'error': 'API endpoint not found'}), 404
     if Path(f'../../web/dist/{path}').exists():
         return send_from_directory('../../web/dist', path)
     return index()  # Fallback para SPA
