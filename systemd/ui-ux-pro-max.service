@@ -1,0 +1,42 @@
+[Unit]
+Description=UI/UX Pro Max Editor - Web Application
+Documentation=https://github.com/felippepestana/ui-ux-pro-max-skill
+After=docker.service network-online.target
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+
+# Working directory
+WorkingDirectory=/opt/ui-ux-pro-max
+
+# Commands
+ExecStartPre=/usr/bin/docker-compose -f docker-compose.yml pull
+ExecStart=/usr/bin/docker-compose -f docker-compose.yml up -d
+ExecStop=/usr/bin/docker-compose -f docker-compose.yml down
+
+# Restart policy
+Restart=on-failure
+RestartSec=10
+StartLimitInterval=60s
+StartLimitBurst=3
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ui-ux-pro-max
+
+# User/Group
+User=root
+Group=root
+
+# Security
+ProtectSystem=strict
+ProtectHome=yes
+NoNewPrivileges=true
+ReadWritePaths=/opt/ui-ux-pro-max
+
+[Install]
+WantedBy=multi-user.target

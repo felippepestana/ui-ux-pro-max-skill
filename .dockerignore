@@ -1,0 +1,53 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Dependencies
+node_modules
+*.egg-info
+__pycache__
+.pytest_cache
+.venv
+venv
+
+# Build artifacts
+web/dist
+*.pyc
+*.pyo
+.tsc
+dist
+
+# Editor/IDE
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs
+
+# Testing
+coverage
+.coverage
+
+# Documentation
+docs
+README.md
+QUICKSTART.md
+ARCHITECTURE.md
+EDITOR_README.md
+IMPLEMENTATION_SUMMARY.md
+
+# Misc
+.cache
+.eslintcache
+.turbo
+turbo.json
