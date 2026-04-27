@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { Route } from "next";
 import {
   LayoutDashboard,
   Inbox,
@@ -19,8 +20,13 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+/**
+ * With `experimental.typedRoutes` enabled in next.config.ts, `Route` is a
+ * branded string of paths known at build time, so links to non-existent
+ * routes fail to type-check.
+ */
 type NavItem = {
-  href: string;
+  href: Route;
   label: string;
   icon: LucideIcon;
   badge?: string | number;
@@ -106,7 +112,7 @@ export function Sidebar({ className }: { className?: string }) {
                 return (
                   <li key={item.href}>
                     <Link
-                      href={item.href as never}
+                      href={item.href}
                       aria-current={active ? "page" : undefined}
                       className={cn(
                         "group flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",

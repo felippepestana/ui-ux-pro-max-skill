@@ -77,7 +77,9 @@
     --shadow-sm: 0 1px 2px 0 rgb(15 23 42 / 0.04);
     --shadow-md: 0 4px 12px -2px rgb(15 23 42 / 0.08);
     --shadow-lg: 0 16px 40px -8px rgb(15 23 42 / 0.12);
-    --shadow-focus: 0 0 0 3px rgb(30 58 138 / 0.4);
+    /* Channels (no prefix) so we can apply alpha at the call site */
+    --focus-ring-rgb: 30 58 138; /* matches --navy-700 */
+    --shadow-focus: 0 0 0 3px rgb(var(--focus-ring-rgb) / 0.4);
 
     /* ─── Type scale ───────────────────────────────────────────── */
     --text-xs: 0.75rem;     /* 12 */
@@ -130,6 +132,14 @@
     --sidebar-border: var(--slate-200);
     --sidebar-accent: var(--navy-50);
     --sidebar-accent-foreground: var(--navy-700);
+
+    /* ─── Tonal surfaces (subtle backgrounds for KPI/tone chips) ── */
+    --surface-primary: var(--navy-50);
+    --surface-accent: var(--gold-50);
+    --surface-success: #ECFDF4;
+    --surface-warning: #FEF7E0;
+    --surface-info: #E0F2FE;
+    --surface-destructive: #FEE2E2;
   }
 
   .dark {
@@ -165,7 +175,14 @@
     --sidebar-accent: var(--slate-800);
     --sidebar-accent-foreground: var(--navy-200);
 
-    --shadow-focus: 0 0 0 3px rgb(143 164 210 / 0.55);
+    --surface-primary: rgb(30 58 138 / 0.18);
+    --surface-accent: rgb(180 83 9 / 0.22);
+    --surface-success: rgb(22 163 74 / 0.22);
+    --surface-warning: rgb(202 138 4 / 0.22);
+    --surface-info: rgb(14 165 233 / 0.22);
+    --surface-destructive: rgb(220 38 38 / 0.22);
+
+    --focus-ring-rgb: 143 164 210; /* matches --navy-300 */
   }
 
   @media (prefers-reduced-motion: reduce) {

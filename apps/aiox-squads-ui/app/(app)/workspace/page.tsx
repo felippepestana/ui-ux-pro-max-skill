@@ -112,10 +112,10 @@ export default function WorkspacePage() {
         {KPIS.map((kpi) => {
           const Icon = kpi.icon;
           const toneBg = {
-            primary: "bg-[var(--navy-50)] text-[var(--primary)]",
-            accent: "bg-[var(--gold-50)] text-[var(--accent)]",
-            warning: "bg-amber-50 text-[var(--warning)]",
-            success: "bg-emerald-50 text-[var(--success)]",
+            primary: "bg-[var(--surface-primary)] text-[var(--primary)]",
+            accent: "bg-[var(--surface-accent)] text-[var(--accent)]",
+            warning: "bg-[var(--surface-warning)] text-[var(--warning)]",
+            success: "bg-[var(--surface-success)] text-[var(--success)]",
           }[kpi.tone];
           return (
             <Card key={kpi.label}>
@@ -197,7 +197,7 @@ export default function WorkspacePage() {
                       {squad.matter}
                     </p>
                   </div>
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--navy-50)] px-2.5 py-1 text-xs font-medium text-[var(--primary)]">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--surface-primary)] px-2.5 py-1 text-xs font-medium text-[var(--primary)]">
                     <Sparkles className="h-3 w-3" aria-hidden />
                     {squad.agent}
                   </span>
@@ -212,7 +212,7 @@ export default function WorkspacePage() {
                     aria-label={`Progresso de ${squad.name}`}
                   >
                     <div
-                      className="h-full bg-[var(--primary)] transition-[width]"
+                      className="h-full bg-[var(--primary)] transition-[width] duration-500 ease-out"
                       style={{ width: `${squad.progress}%` }}
                     />
                   </div>
