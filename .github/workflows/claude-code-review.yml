@@ -12,9 +12,7 @@ on:
 
 jobs:
   claude-review:
-    # Disabled: Requires CLAUDE_CODE_OAUTH_TOKEN secret to be configured
-    # To enable: Set up the token in Settings → Secrets and Variables → Actions
-    if: false
+    # Token CLAUDE_CODE_OAUTH_TOKEN configurado no GitHub Settings → Secrets
 
     runs-on: ubuntu-latest
     permissions:
