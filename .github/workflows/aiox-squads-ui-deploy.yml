@@ -54,7 +54,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Check Vercel secrets
+        id: secrets
+        env:
+          TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          if [ -z "$TOKEN" ] || [ -z "$ORG_ID" ] || [ -z "$PROJECT_ID" ]; then
+            echo "::warning title=Vercel deploy skipped::VERCEL_TOKEN, VERCEL_ORG_ID and VERCEL_PROJECT_ID must be configured in Settings → Secrets → Actions. See apps/aiox-squads-ui/docs/DEPLOY.md."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Setup Node 22
+        if: steps.secrets.outputs.configured == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -62,9 +77,11 @@ jobs:
           cache-dependency-path: apps/aiox-squads-ui/package-lock.json
 
       - name: Install Vercel CLI
+        if: steps.secrets.outputs.configured == 'true'
         run: npm install --global vercel@latest
 
       - name: Resolve target
+        if: steps.secrets.outputs.configured == 'true'
         id: target
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" || "${{ inputs.environment }}" == "production" ]]; then
@@ -76,12 +93,15 @@ jobs:
           fi
 
       - name: Pull Vercel environment
+        if: steps.secrets.outputs.configured == 'true'
         run: vercel pull --yes --environment=${{ steps.target.outputs.env }} --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Build with Vercel
+        if: steps.secrets.outputs.configured == 'true'
         run: vercel build ${{ steps.target.outputs.flag }} --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy prebuilt artifacts
+        if: steps.secrets.outputs.configured == 'true'
         id: deploy
         run: |
           url=$(vercel deploy --prebuilt ${{ steps.target.outputs.flag }} --token=${{ secrets.VERCEL_TOKEN }})
@@ -89,7 +109,7 @@ jobs:
           echo "::notice title=Deployed::$url"
 
       - name: Comment preview URL on PR
-        if: steps.target.outputs.env == 'preview' && github.event_name == 'push'
+        if: steps.secrets.outputs.configured == 'true' && steps.target.outputs.env == 'preview' && github.event_name == 'push'
         uses: actions/github-script@v7
         with:
           script: |
