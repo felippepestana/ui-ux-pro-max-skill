@@ -51,3 +51,17 @@ lib/
 - [ ] Casos + Squads — Fase 2
 
 Próximas fases descritas em `/root/.claude/plans/busque-referencias-relativas-a-snoopy-island.md`.
+
+## Deploy
+
+Veja [`docs/DEPLOY.md`](./docs/DEPLOY.md) para o passo a passo. Resumo:
+
+- **Vercel nativo** (recomendado): conecta o repo no painel Vercel, define
+  `apps/aiox-squads-ui` como root directory e pronto.
+- **GitHub Actions**: workflows em `.github/workflows/aiox-squads-ui-{ci,deploy}.yml`
+  validam typecheck/lint/build em todo PR e fazem deploy para Vercel via CLI
+  quando você prefere controlar o pipeline. Requer secrets `VERCEL_TOKEN`,
+  `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
+
+> ⚠️ **Não mantenha os dois deploys ativos ao mesmo tempo** — gera builds
+> duplicados. Escolha um. O CI roda em paralelo sem conflito.

@@ -1,0 +1,111 @@
+name: aiox-squads-ui · Deploy (Vercel)
+
+# Two-track deploy:
+#   - push em `main`               → Production deploy
+#   - push em qualquer outra branch → Preview deploy (somente se afetar o app)
+#   - workflow_dispatch            → Manual (escolhe production via input)
+#
+# IMPORTANT: para evitar deploys duplicados com a integração nativa do Vercel,
+# desligue uma das duas:
+#   (a) No painel Vercel → Project → Settings → Git → desabilite "Production
+#       Branch" auto-deploy e/ou "Preview Deployments" → e mantenha este workflow.
+#   (b) OU mantenha a integração nativa Vercel ligada e remova/desabilite
+#       este workflow.
+# Manter ambos ativos resulta em duas builds por commit.
+
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "apps/aiox-squads-ui/**"
+      - ".github/workflows/aiox-squads-ui-deploy.yml"
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        type: choice
+        required: true
+        default: preview
+        options:
+          - preview
+          - production
+
+concurrency:
+  group: aiox-ui-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  NEXT_TELEMETRY_DISABLED: "1"
+
+defaults:
+  run:
+    working-directory: apps/aiox-squads-ui
+
+jobs:
+  deploy:
+    name: Deploy to Vercel
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: ${{ (github.ref == 'refs/heads/main' || inputs.environment == 'production') && 'production' || 'preview' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: apps/aiox-squads-ui/package-lock.json
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Resolve target
+        id: target
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" || "${{ inputs.environment }}" == "production" ]]; then
+            echo "env=production" >> "$GITHUB_OUTPUT"
+            echo "flag=--prod" >> "$GITHUB_OUTPUT"
+          else
+            echo "env=preview" >> "$GITHUB_OUTPUT"
+            echo "flag=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Pull Vercel environment
+        run: vercel pull --yes --environment=${{ steps.target.outputs.env }} --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build with Vercel
+        run: vercel build ${{ steps.target.outputs.flag }} --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy prebuilt artifacts
+        id: deploy
+        run: |
+          url=$(vercel deploy --prebuilt ${{ steps.target.outputs.flag }} --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "::notice title=Deployed::$url"
+
+      - name: Comment preview URL on PR
+        if: steps.target.outputs.env == 'preview' && github.event_name == 'push'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const url = "${{ steps.deploy.outputs.url }}";
+            const sha = context.sha.substring(0, 7);
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open",
+              head: `${context.repo.owner}:${context.ref.replace("refs/heads/", "")}`,
+            });
+            for (const pr of prs) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: `🔗 **aiox-squads-ui · Preview deploy**\n\n${url}\n\nCommit: \`${sha}\``,
+              });
+            }
