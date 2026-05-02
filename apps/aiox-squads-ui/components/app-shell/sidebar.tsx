@@ -5,17 +5,21 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Route } from "next";
 import {
-  LayoutDashboard,
-  Inbox,
+  Bot,
   Briefcase,
-  Users2,
-  FileText,
   BookMarked,
-  UserSquare2,
+  Clock,
+  FileText,
+  Inbox,
+  LayoutDashboard,
+  ListChecks,
   Receipt,
-  ShieldCheck,
+  ScrollText,
   Settings,
+  ShieldCheck,
   Sparkles,
+  UserSquare2,
+  Users2,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -42,24 +46,33 @@ const NAV: NavSection[] = [
     title: "Operação",
     items: [
       { href: "/workspace", label: "Workspace", icon: LayoutDashboard },
-      { href: "/inbox", label: "Inbox", icon: Inbox, badge: 3 },
+      { href: "/inbox", label: "Inbox HITL", icon: Inbox, badge: 3 },
     ],
   },
   {
     title: "Trabalho jurídico",
     items: [
       { href: "/matters", label: "Casos", icon: Briefcase },
-      { href: "/squads", label: "Squads", icon: Users2 },
-      { href: "/agents", label: "Agentes", icon: Sparkles },
+      { href: "/leads", label: "Leads", icon: Sparkles },
+      { href: "/clients", label: "Clientes", icon: UserSquare2 },
+      { href: "/tasks", label: "Tarefas", icon: ListChecks },
+      { href: "/deadlines", label: "Prazos", icon: Clock },
       { href: "/documents", label: "Documentos", icon: FileText },
       { href: "/knowledge", label: "Knowledge Base", icon: BookMarked },
     ],
   },
   {
+    title: "Automação",
+    items: [
+      { href: "/squads", label: "Squads", icon: Users2 },
+      { href: "/agents", label: "Agentes", icon: Bot },
+    ],
+  },
+  {
     title: "Negócio",
     items: [
-      { href: "/clients", label: "Clientes", icon: UserSquare2 },
       { href: "/billing", label: "Faturamento", icon: Receipt },
+      { href: "/audit", label: "Auditoria", icon: ScrollText },
     ],
   },
   {

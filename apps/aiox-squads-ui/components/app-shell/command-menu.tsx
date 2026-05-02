@@ -4,16 +4,23 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import type { Route } from "next";
 import {
-  Briefcase,
   BookMarked,
+  BookOpenCheck,
+  Bot,
+  Briefcase,
+  Clock,
+  FileEdit,
   FileText,
   Inbox,
   LayoutDashboard,
+  ListChecks,
   Plus,
   Receipt,
+  ScrollText,
   Settings,
   ShieldCheck,
   Sparkles,
+  UserPlus,
   UserSquare2,
   Users2,
   type LucideIcon,
@@ -42,12 +49,16 @@ const NAV_COMMANDS: NavCommand[] = [
   { label: "Workspace", href: "/workspace", icon: LayoutDashboard },
   { label: "Inbox HITL", href: "/inbox", icon: Inbox },
   { label: "Casos", href: "/matters", icon: Briefcase },
-  { label: "Squads", href: "/squads", icon: Users2 },
-  { label: "Agentes", href: "/agents", icon: Sparkles },
+  { label: "Leads", href: "/leads", icon: Sparkles },
+  { label: "Clientes", href: "/clients", icon: UserSquare2 },
+  { label: "Tarefas", href: "/tasks", icon: ListChecks },
+  { label: "Prazos", href: "/deadlines", icon: Clock },
   { label: "Documentos", href: "/documents", icon: FileText },
   { label: "Knowledge Base", href: "/knowledge", icon: BookMarked },
-  { label: "Clientes", href: "/clients", icon: UserSquare2 },
+  { label: "Squads", href: "/squads", icon: Users2 },
+  { label: "Agentes", href: "/agents", icon: Bot },
   { label: "Faturamento", href: "/billing", icon: Receipt },
+  { label: "Auditoria", href: "/audit", icon: ScrollText },
   { label: "Equipe", href: "/team", icon: ShieldCheck },
   { label: "Configurações", href: "/settings", icon: Settings },
 ];
@@ -99,17 +110,43 @@ export function CommandMenuProvider({ children }: { children: React.ReactNode })
         onSelect: () => runCommand(() => router.push("/matters")),
       },
       {
-        label: "Iniciar squad",
-        description: "Disparar pipeline de agentes IA",
-        icon: Sparkles,
-        shortcut: "S",
-        onSelect: () => runCommand(() => router.push("/squads")),
+        label: "Novo lead",
+        description: "Registrar oportunidade no pipeline",
+        icon: Plus,
+        onSelect: () => runCommand(() => router.push("/leads")),
       },
       {
         label: "Convidar membro",
         description: "Adicionar advogado, paralegal ou cliente",
         icon: ShieldCheck,
         onSelect: () => runCommand(() => router.push("/team")),
+      },
+    ],
+    [router, runCommand],
+  );
+
+  const SQUAD_COMMANDS: ActionCommand[] = React.useMemo(
+    () => [
+      {
+        label: "Squad · Pesquisa Jurisprudencial",
+        description: "Encontra precedentes alinhados à tese do caso",
+        icon: BookOpenCheck,
+        onSelect: () =>
+          runCommand(() => router.push("/squads/sq-jurisp")),
+      },
+      {
+        label: "Squad · Redação de Petição Inicial",
+        description: "Gera primeira versão de petição com base no caso",
+        icon: FileEdit,
+        onSelect: () =>
+          runCommand(() => router.push("/squads/sq-peticao")),
+      },
+      {
+        label: "Squad · Triagem de Lead",
+        description: "Qualifica lead e sugere área de atuação",
+        icon: UserPlus,
+        onSelect: () =>
+          runCommand(() => router.push("/squads/sq-triagem")),
       },
     ],
     [router, runCommand],
@@ -140,6 +177,27 @@ export function CommandMenuProvider({ children }: { children: React.ReactNode })
                   {action.shortcut && (
                     <CommandShortcut>{action.shortcut}</CommandShortcut>
                   )}
+                </CommandItem>
+              );
+            })}
+          </CommandGroup>
+
+          <CommandSeparator />
+
+          <CommandGroup heading="Squads">
+            {SQUAD_COMMANDS.map((squad) => {
+              const Icon = squad.icon;
+              return (
+                <CommandItem
+                  key={squad.label}
+                  value={`${squad.label} ${squad.description}`}
+                  onSelect={squad.onSelect}
+                >
+                  <Icon aria-hidden />
+                  <span>{squad.label}</span>
+                  <span className="text-xs text-[var(--muted-foreground)]">
+                    {squad.description}
+                  </span>
                 </CommandItem>
               );
             })}
