@@ -10,8 +10,13 @@
  * SquadLauncherButton can filter by entity in F2 onwards.
  */
 
-import type { LucideIcon } from "lucide-react";
-import { BookOpenCheck, FileEdit, UserPlus } from "lucide-react";
+/**
+ * `iconKey` is a string identifier (not the LucideIcon component) so the
+ * Squad type stays serialisable and can cross the RSC boundary into client
+ * components. Use `getSquadIcon(iconKey)` from `lib/squad-icons` to resolve
+ * the actual icon component on the client.
+ */
+export type SquadIconKey = "book-open-check" | "file-edit" | "user-plus";
 
 export type SquadContextType = "matter" | "document" | "lead";
 
@@ -28,7 +33,7 @@ export type Squad = {
   name: string;
   tagline: string;
   description: string;
-  icon: LucideIcon;
+  iconKey: SquadIconKey;
   contextTypes: SquadContextType[];
   agents: Agent[];
   avgDurationSeconds: number;
@@ -45,7 +50,7 @@ export const SQUADS: Squad[] = [
     tagline: "Encontra precedentes alinhados à tese do caso",
     description:
       "Pipeline que extrai a controvérsia jurídica do caso, busca decisões em STJ/STF e tribunais relevantes, ranqueia por aderência e devolve citações clicáveis prontas para ancorar a peça.",
-    icon: BookOpenCheck,
+    iconKey: "book-open-check",
     contextTypes: ["matter", "document"],
     agents: [
       {
@@ -85,7 +90,7 @@ export const SQUADS: Squad[] = [
     tagline: "Gera primeira versão de petição com base no caso",
     description:
       "Toma o resumo do caso, pedidos e jurisprudência relacionada, devolve uma minuta de petição inicial com estrutura processual correta, fundamentação e pedidos. Resultado entra no módulo Documentos como versão v1 em rascunho.",
-    icon: FileEdit,
+    iconKey: "file-edit",
     contextTypes: ["matter", "document"],
     agents: [
       {
@@ -119,7 +124,7 @@ export const SQUADS: Squad[] = [
     tagline: "Qualifica lead recebido e sugere área de atuação",
     description:
       "Analisa o conteúdo recebido (formulário, e-mail, WhatsApp), identifica área do direito, urgência, potencial conflito de interesse e estima valor de causa. Devolve recomendação de aceite ou recusa com justificativa.",
-    icon: UserPlus,
+    iconKey: "user-plus",
     contextTypes: ["lead"],
     agents: [
       {

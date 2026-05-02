@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { getSquadIcon } from "@/lib/squad-icons";
 import { getSquadById, SQUADS } from "@/lib/squads";
 
 export function generateStaticParams() {
@@ -25,7 +26,7 @@ export default async function SquadDetailPage({
   const squad = getSquadById(id);
   if (!squad) notFound();
 
-  const Icon = squad.icon;
+  const Icon = getSquadIcon(squad.iconKey);
 
   return (
     <div className="flex flex-col gap-8">

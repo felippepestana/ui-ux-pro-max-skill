@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { getSquadIcon } from "@/lib/squad-icons";
 import { getSquadsForContext, type SquadContextType } from "@/lib/squads";
 
 interface SquadLauncherButtonProps {
@@ -41,7 +42,7 @@ export function SquadLauncherButton({
         <DropdownMenuLabel>Para “{contextLabel}”</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {squads.map((squad) => {
-          const Icon = squad.icon;
+          const Icon = getSquadIcon(squad.iconKey);
           return (
             <DropdownMenuItem
               key={squad.id}
