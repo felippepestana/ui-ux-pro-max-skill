@@ -1,0 +1,663 @@
+// aiox-squads-ui — Prisma schema
+//
+// This schema is the canonical data model for the v1.0 backend (Phase F6).
+// It mirrors the entities defined in the unified plan
+// (/root/.claude/plans/busque-referencias-relativas-a-snoopy-island.md
+// section 8) and is consumed by the tRPC routers in `lib/trpc/routers/`.
+//
+// To activate against a real Postgres instance (Vercel Postgres, Supabase
+// or local Docker), set DATABASE_URL in `.env` and run:
+//
+//   npx prisma generate
+//   npx prisma migrate dev --name init
+//   npx prisma db seed
+//
+// See `docs/BACKEND.md` for the full activation guide.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Tenant + identity ────────────────────────────────────────────────
+
+model Office {
+  id        String   @id @default(cuid())
+  name      String
+  plan      String   @default("free")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users         User[]
+  clients       Client[]
+  leads         Lead[]
+  matters       Matter[]
+  documents     Document[]
+  invoices      Invoice[]
+  squadRuns     SquadRun[]
+  auditLogs     AuditLog[]
+}
+
+enum UserRole {
+  socio
+  advogado
+  paralegal
+  financeiro
+  cliente
+}
+
+enum UserStatus {
+  ativo
+  convidado
+  inativo
+}
+
+model User {
+  id           String     @id @default(cuid())
+  officeId     String
+  office       Office     @relation(fields: [officeId], references: [id], onDelete: Cascade)
+  email        String     @unique
+  name         String
+  role         UserRole
+  status       UserStatus @default(ativo)
+  mfaEnabled   Boolean    @default(false)
+  joinedAt     DateTime   @default(now())
+  lastActiveAt DateTime?
+
+  assignedTasks    Task[]      @relation("TaskAssignee")
+  fulfilledDeadlines Deadline[] @relation("DeadlineFulfilledBy")
+  hitlTasks        HitlTask[]
+  documentVersions DocumentVersion[]
+
+  @@index([officeId])
+}
+
+// ─── Pipeline + accounts ──────────────────────────────────────────────
+
+enum ClientKind {
+  PF
+  PJ
+}
+
+enum ClientConflictStatus {
+  limpo
+  verificar
+  conflito
+}
+
+model Client {
+  id              String               @id @default(cuid())
+  officeId        String
+  office          Office               @relation(fields: [officeId], references: [id], onDelete: Cascade)
+  kind            ClientKind
+  name            String
+  taxId           String
+  email           String
+  phone           String?
+  address         String?
+  tags            String[]
+  conflictStatus  ClientConflictStatus @default(limpo)
+  notes           String?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  contacts      Contact[]
+  matters       Matter[]
+  matterParties MatterParty[]
+  invoices      Invoice[]
+  comms         Communication[]
+  contracts     FeeContract[]
+
+  @@unique([officeId, taxId])
+  @@index([officeId])
+}
+
+model Contact {
+  id        String  @id @default(cuid())
+  clientId  String
+  client    Client  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  name      String
+  email     String?
+  phone     String?
+  role      String?
+
+  @@index([clientId])
+}
+
+enum LeadStage {
+  novo
+  qualificado
+  proposta
+  aceite
+  perdido
+}
+
+enum LeadSource {
+  site
+  indicacao
+  linkedin
+  instagram
+  google
+  evento
+}
+
+model Lead {
+  id                 String     @id @default(cuid())
+  officeId           String
+  office             Office     @relation(fields: [officeId], references: [id], onDelete: Cascade)
+  name               String
+  contactEmail       String
+  contactPhone       String
+  source             LeadSource
+  area               String
+  summary            String
+  estimatedValueBrl  Decimal    @db.Decimal(14, 2)
+  stage              LeadStage  @default(novo)
+  expectedCloseAt    DateTime?
+  lostReason         String?
+  triagedRunId       String?
+  convertedClientId  String?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  @@index([officeId])
+  @@index([stage])
+}
+
+// ─── Matters + work ────────────────────────────────────────────────────
+
+enum MatterStatus {
+  intake
+  triagem
+  ativo
+  aguardando_cliente
+  audiencia
+  encerrado
+}
+
+enum MatterPriority {
+  low
+  normal
+  high
+  critical
+}
+
+model Matter {
+  id              String         @id @default(cuid())
+  officeId        String
+  office          Office         @relation(fields: [officeId], references: [id], onDelete: Cascade)
+  code            String
+  clientId        String
+  client          Client         @relation(fields: [clientId], references: [id])
+  area            String
+  type            String
+  status          MatterStatus   @default(intake)
+  priority        MatterPriority @default(normal)
+  caseValueBrl    Decimal?       @db.Decimal(14, 2)
+  riskValueBrl    Decimal?       @db.Decimal(14, 2)
+  responsibleId   String?
+  openedAt        DateTime       @default(now())
+  closedAt        DateTime?
+  updatedAt       DateTime       @updatedAt
+
+  parties        MatterParty[]
+  tasks          Task[]
+  deadlines      Deadline[]
+  documents      Document[]
+  events         TimelineEvent[]
+  feeContracts   FeeContract[]
+  invoices       Invoice[]
+  comms          Communication[]
+
+  @@unique([officeId, code])
+  @@index([officeId, status])
+  @@index([clientId])
+}
+
+enum PartyRole {
+  autor
+  reu
+  terceiro
+}
+
+model MatterParty {
+  matterId String
+  matter   Matter    @relation(fields: [matterId], references: [id], onDelete: Cascade)
+  clientId String
+  client   Client    @relation(fields: [clientId], references: [id])
+  role     PartyRole
+
+  @@id([matterId, clientId, role])
+}
+
+enum TaskStatus {
+  todo
+  doing
+  review
+  done
+}
+
+enum TaskPriority {
+  low
+  normal
+  high
+  critical
+}
+
+model Task {
+  id          String       @id @default(cuid())
+  matterId    String
+  matter      Matter       @relation(fields: [matterId], references: [id], onDelete: Cascade)
+  deadlineId  String?
+  deadline    Deadline?    @relation(fields: [deadlineId], references: [id])
+  title       String
+  description String?
+  status      TaskStatus   @default(todo)
+  priority    TaskPriority @default(normal)
+  assigneeId  String
+  assignee    User         @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  dueAt       DateTime?
+  checklist   Json?
+  dependsOnId String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([matterId])
+  @@index([assigneeId, status])
+}
+
+enum DeadlineKind {
+  audiencia
+  peticao
+  replica
+  treplica
+  memoriais
+  recurso
+  manifestacao
+  diligencia
+}
+
+enum DeadlineStatus {
+  agendado
+  em_andamento
+  cumprido
+  perdido
+}
+
+model Deadline {
+  id              String         @id @default(cuid())
+  matterId        String
+  matter          Matter         @relation(fields: [matterId], references: [id], onDelete: Cascade)
+  kind            DeadlineKind
+  title           String
+  court           String
+  forensicRule    String?
+  dueAt           DateTime
+  status          DeadlineStatus @default(agendado)
+  evidenceUrl     String?
+  fulfilledAt     DateTime?
+  fulfilledById   String?
+  fulfilledBy     User?          @relation("DeadlineFulfilledBy", fields: [fulfilledById], references: [id])
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  tasks Task[]
+
+  @@index([matterId])
+  @@index([dueAt])
+}
+
+enum TimelineEventSource {
+  human
+  squad
+  system
+}
+
+model TimelineEvent {
+  id         String              @id @default(cuid())
+  matterId   String
+  matter     Matter              @relation(fields: [matterId], references: [id], onDelete: Cascade)
+  kind       String
+  payload    Json
+  sourceType TimelineEventSource
+  sourceId   String?
+  occurredAt DateTime            @default(now())
+
+  @@index([matterId, occurredAt])
+}
+
+// ─── Documents ─────────────────────────────────────────────────────────
+
+enum DocumentStatus {
+  rascunho
+  em_revisao
+  aprovado
+  protocolado
+  arquivado
+}
+
+model Document {
+  id                 String          @id @default(cuid())
+  officeId           String
+  office             Office          @relation(fields: [officeId], references: [id], onDelete: Cascade)
+  matterId           String?
+  matter             Matter?         @relation(fields: [matterId], references: [id])
+  templateId         String?
+  template           DocumentTemplate? @relation(fields: [templateId], references: [id])
+  kind               String
+  title              String
+  status             DocumentStatus  @default(rascunho)
+  approvalsRequired  Int             @default(1)
+  approvalsObtained  Int             @default(0)
+  signers            String[]
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  versions DocumentVersion[]
+
+  @@index([officeId])
+  @@index([matterId])
+}
+
+model DocumentVersion {
+  id           String    @id @default(cuid())
+  documentId   String
+  document     Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  version      Int
+  authorId     String?
+  author       User?     @relation(fields: [authorId], references: [id])
+  authorName   String
+  sourceRunId  String?
+  blobUrl      String?
+  excerpt      String?
+  diffAdded    Int?
+  diffRemoved  Int?
+  createdAt    DateTime  @default(now())
+
+  @@unique([documentId, version])
+  @@index([documentId])
+}
+
+model DocumentTemplate {
+  id          String     @id @default(cuid())
+  officeId    String
+  area        String
+  kind        String
+  title       String
+  description String?
+  body        String?
+  variables   String[]
+  usageCount  Int        @default(0)
+  createdAt   DateTime   @default(now())
+
+  documents Document[]
+
+  @@index([officeId])
+}
+
+// ─── Billing ───────────────────────────────────────────────────────────
+
+enum FeeKind {
+  fixo
+  exito
+  hora
+  mensal
+}
+
+model FeeContract {
+  id                  String   @id @default(cuid())
+  matterId            String?
+  matter              Matter?  @relation(fields: [matterId], references: [id])
+  clientId            String
+  client              Client   @relation(fields: [clientId], references: [id])
+  kind                FeeKind
+  description         String
+  fixedFeeBrl         Decimal? @db.Decimal(14, 2)
+  successFeePercent   Decimal? @db.Decimal(5, 2)
+  hourlyRateBrl       Decimal? @db.Decimal(14, 2)
+  monthlyRetainerBrl  Decimal? @db.Decimal(14, 2)
+  signedAt            DateTime
+  status              String   @default("ativo")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  invoices Invoice[]
+
+  @@index([clientId])
+}
+
+enum InvoiceStatus {
+  aberta
+  enviada
+  paga
+  vencida
+  cancelada
+}
+
+model Invoice {
+  id                String        @id @default(cuid())
+  officeId          String
+  office            Office        @relation(fields: [officeId], references: [id], onDelete: Cascade)
+  number            String
+  contractId        String?
+  contract          FeeContract?  @relation(fields: [contractId], references: [id])
+  clientId          String
+  client            Client        @relation(fields: [clientId], references: [id])
+  matterId          String?
+  matter            Matter?       @relation(fields: [matterId], references: [id])
+  competenceMonth   String
+  issuedAt          DateTime      @default(now())
+  dueAt             DateTime
+  totalBrl          Decimal       @db.Decimal(14, 2)
+  status            InvoiceStatus @default(aberta)
+
+  lines    InvoiceLine[]
+  payments Payment[]
+
+  @@unique([officeId, number])
+  @@index([officeId])
+  @@index([dueAt, status])
+}
+
+model InvoiceLine {
+  id          String  @id @default(cuid())
+  invoiceId   String
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  description String
+  qty         Decimal @db.Decimal(14, 2)
+  unitBrl     Decimal @db.Decimal(14, 2)
+
+  @@index([invoiceId])
+}
+
+enum PaymentMethod {
+  PIX
+  TED
+  Boleto
+  Cartao
+}
+
+model Payment {
+  id        String        @id @default(cuid())
+  invoiceId String
+  invoice   Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  paidAt    DateTime
+  amountBrl Decimal       @db.Decimal(14, 2)
+  method    PaymentMethod
+  notes     String?
+  createdAt DateTime      @default(now())
+
+  @@index([invoiceId])
+}
+
+// ─── Communication with clients ────────────────────────────────────────
+
+enum CommunicationKind {
+  solicitacao
+  aprovacao
+  aviso
+}
+
+enum CommunicationStatus {
+  pendente
+  recebida
+  respondida
+  cancelada
+}
+
+model Communication {
+  id           String              @id @default(cuid())
+  matterId     String
+  matter       Matter              @relation(fields: [matterId], references: [id], onDelete: Cascade)
+  clientId     String
+  client       Client              @relation(fields: [clientId], references: [id])
+  kind         CommunicationKind
+  status       CommunicationStatus @default(pendente)
+  body         String
+  requestedAt  DateTime            @default(now())
+  respondedAt  DateTime?
+
+  @@index([matterId])
+}
+
+// ─── Automation: Squads + Agents + Runs ────────────────────────────────
+
+enum SquadContextType {
+  matter
+  document
+  lead
+  invoice
+}
+
+enum SquadRunStatus {
+  queued
+  running
+  needs_review
+  approved
+  rejected
+  failed
+}
+
+enum RunStepStatus {
+  queued
+  running
+  done
+  failed
+}
+
+model Squad {
+  id           String   @id @default(cuid())
+  key          String   @unique
+  name         String
+  tagline      String?
+  description  String?
+  iconKey      String
+  contextTypes SquadContextType[]
+  capabilities String[]
+  createdAt    DateTime @default(now())
+
+  runs SquadRun[]
+}
+
+model Agent {
+  id           String   @id @default(cuid())
+  key          String   @unique
+  name         String
+  role         String
+  capabilities String[]
+}
+
+model SquadRun {
+  id              String         @id @default(cuid())
+  officeId        String
+  office          Office         @relation(fields: [officeId], references: [id], onDelete: Cascade)
+  squadId         String
+  squad           Squad          @relation(fields: [squadId], references: [id])
+  contextType     SquadContextType
+  contextId       String
+  status          SquadRunStatus @default(queued)
+  startedAt       DateTime?
+  finishedAt      DateTime?
+  totalTokens     Int            @default(0)
+  totalCostCents  Int            @default(0)
+  createdAt       DateTime       @default(now())
+
+  steps    SquadRunStep[]
+  hitlTask HitlTask?
+
+  @@index([officeId])
+  @@index([contextType, contextId])
+}
+
+model SquadRunStep {
+  id          String        @id @default(cuid())
+  runId       String
+  run         SquadRun      @relation(fields: [runId], references: [id], onDelete: Cascade)
+  agentKey    String
+  agentName   String
+  input       Json?
+  output      Json?
+  citations   Json?
+  tokens      Int           @default(0)
+  costCents   Int           @default(0)
+  status      RunStepStatus @default(queued)
+  startedAt   DateTime?
+  finishedAt  DateTime?
+
+  @@index([runId])
+}
+
+enum HitlStatus {
+  pending
+  approved
+  rejected
+}
+
+model HitlTask {
+  id          String     @id @default(cuid())
+  runId       String     @unique
+  run         SquadRun   @relation(fields: [runId], references: [id], onDelete: Cascade)
+  assigneeId  String
+  assignee    User       @relation(fields: [assigneeId], references: [id])
+  priority    String     @default("normal")
+  dueAt       DateTime?
+  status      HitlStatus @default(pending)
+  reviewedAt  DateTime?
+  notes       String?
+  createdAt   DateTime   @default(now())
+
+  @@index([assigneeId, status])
+}
+
+// ─── Audit ─────────────────────────────────────────────────────────────
+
+enum AuditActorType {
+  human
+  squad
+  system
+}
+
+model AuditLog {
+  id         String         @id @default(cuid())
+  officeId   String
+  office     Office         @relation(fields: [officeId], references: [id], onDelete: Cascade)
+  actorType  AuditActorType
+  actorId    String?
+  actorName  String
+  entityType String
+  entityId   String
+  action     String
+  summary    String
+  before     Json?
+  after      Json?
+  ip         String?
+  occurredAt DateTime       @default(now())
+
+  @@index([officeId, occurredAt])
+  @@index([entityType, entityId, occurredAt])
+}
