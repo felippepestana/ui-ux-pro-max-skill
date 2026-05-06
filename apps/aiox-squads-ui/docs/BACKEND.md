@@ -1,156 +1,162 @@
 # Backend — aiox-squads-ui
 
-## Estado atual (F6.1)
+## Modos de operação
 
-- ✅ **tRPC** server + client configurados (`lib/trpc/`).
-- ✅ **5 routers** publicados em `/api/trpc`: `matters`, `leads`,
-  `clients`, `squads`, `audit`.
-- ✅ **Schema Prisma completo** em `prisma/schema.prisma` com 17 models +
-  enums tipados (UserRole, MatterStatus, DeadlineKind, etc).
-- ✅ **Auth stub** em `lib/auth.ts` retornando o sócio (Felippe Pestana).
-- ✅ **Middleware de papéis**: `protectedProcedure`, `partnerProcedure`,
-  `lawyerProcedure`, `financialProcedure`.
-- 🟡 **Procedures delegam aos mocks** em `lib/{matters,leads,...}.ts`.
-  Substituir por chamadas Prisma é o trabalho da F6.2.
-- ⛔ **Sem Postgres rodando**, sem Supabase Auth, sem Inngest. Esta sub-fase
-  é apenas o scaffold; nenhum componente da UI ainda chama tRPC (todos
-  continuam importando os mocks diretamente).
+O app sai de fábrica em **modo stub**: tRPC end-to-end + design system
++ todas as 60 rotas funcionando contra mocks em `lib/{matters,leads,…}.ts`.
+Quando você configura Supabase + Postgres no `.env`, ele passa para
+**modo live** sem alterações de código:
 
-## Como rodar tRPC localmente (sem Postgres)
+| Capacidade | Stub mode | Live mode |
+| --- | :---: | :---: |
+| UI completa, navegação, Cmd+K, Squad SSE simulada | ✅ | ✅ |
+| `/api/trpc/*` respondendo dos mocks | ✅ | ✅ |
+| Auth real (Supabase) com cookie de sessão | — | ✅ |
+| Persistência (Prisma + Postgres) | — | F6.3 |
+| RLS por officeId | — | ✅ (após policies) |
+| Realtime para HITL push | — | F6.4 |
 
-Já está rodando. O dev server expõe `POST /api/trpc/<router>.<procedure>`
-e os routers retornam dados dos mocks. Você pode testar com:
+A flag que decide o modo é `BACKEND_ENABLED` em `lib/env.ts`, derivada de
+`NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` + `DATABASE_URL`.
 
-```bash
-npm run dev
-# Em outro terminal
-curl -s -X POST http://localhost:3000/api/trpc/matters.list \
-  -H 'content-type: application/json' \
-  -d '{"json":{}}' | jq
-```
+## Setup Supabase + Postgres (passo a passo)
 
-## Ativar Postgres real (F6.2 — checklist)
+### 1. Criar projeto Supabase (5 min)
 
-### 1. Provisionar banco
+1. https://supabase.com/dashboard → **New Project**.
+2. Nome: `aiox-squads`. Região: **South America (São Paulo)** —
+   `sa-east-1`. Plano Free para dev.
+3. Anote a senha do banco (você vai precisar para `DATABASE_URL`).
 
-Escolha uma das opções (custo zero em free tier):
+### 2. Capturar credenciais
 
-| Opção | Vantagem |
+No painel do projeto:
+
+| Onde | Variável |
 | --- | --- |
-| **Supabase** (recomendado) | Postgres + Auth + Realtime + RLS no mesmo painel |
-| **Neon** | Postgres serverless, branching, integração nativa Vercel |
-| **Postgres local** (Docker) | `docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres:16` |
+| **Settings → API → Project URL** | `NEXT_PUBLIC_SUPABASE_URL` |
+| **Settings → API → anon public** | `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
+| **Settings → API → service_role** (secret!) | `SUPABASE_SERVICE_ROLE_KEY` |
+| **Settings → Database → Connection string → Transaction pooler** | `DATABASE_URL` (adicione `?pgbouncer=true&connection_limit=1`) |
+| **Settings → Database → Connection string → Direct connection** | `DIRECT_URL` |
 
-### 2. Configurar `.env`
+Copie `.env.example` para `.env.local` em `apps/aiox-squads-ui/` e cole
+os valores.
 
-Crie `apps/aiox-squads-ui/.env` (não commit) com:
-
-```
-DATABASE_URL="postgresql://USUARIO:SENHA@HOST:5432/aiox?schema=public"
-DIRECT_URL="postgresql://USUARIO:SENHA@HOST:5432/aiox?schema=public"  # supabase: pooled vs direct
-
-# Supabase Auth (opcional ainda em F6.1)
-NEXT_PUBLIC_SUPABASE_URL="https://xxx.supabase.co"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="eyJ..."
-SUPABASE_SERVICE_ROLE_KEY="eyJ..."  # server-only
-```
-
-### 3. Gerar o Prisma Client + migration
+### 3. Migrar o schema
 
 ```bash
 cd apps/aiox-squads-ui
-npx prisma generate
-npx prisma migrate dev --name init
-npx prisma db seed   # quando criarmos prisma/seed.ts em F6.2
+npm run db:generate          # gera o Prisma Client
+npm run db:migrate -- --name init
 ```
 
-### 4. Substituir mocks pelos calls Prisma
+A migration cria as 17 tabelas no Postgres do Supabase (Office, User,
+Client, Matter, Document, Squad, AuditLog, etc).
 
-Cada `// TODO F6.2` nos routers (`lib/trpc/routers/*.ts`) marca o lugar
-onde o mock vira chamada Prisma. Exemplo:
+### 4. Seed (popular com os dados dos mocks)
 
-```ts
-// Hoje (F6.1):
-return MATTERS.filter((m) => m.status === input?.status);
-
-// Amanhã (F6.2):
-return ctx.db.matter.findMany({
-  where: {
-    officeId: ctx.user.officeId,
-    status: input?.status,
-  },
-  orderBy: { openedAt: "desc" },
-});
+```bash
+npm run db:seed
 ```
 
-### 5. Substituir imports diretos nos componentes
+Insere o escritório Pestana, 5 usuários, 7 clientes, 7 leads, 7 matters,
+8 tasks, 7 deadlines, 6 documentos + 8 templates, 7 contratos, 6 faturas
+e 3 pagamentos — exatamente os mesmos dos mocks. **Idempotente** (usa
+`upsert`), pode rodar múltiplas vezes.
 
-Hoje os componentes importam `import { MATTERS } from "@/lib/matters"`
-direto. Em F6.3 trocamos por:
+### 5. (Opcional) habilitar Auth real
 
-```ts
-const { data: matters } = trpc.matters.list.useQuery({ status: "ativo" });
+No painel Supabase → **Authentication → Providers → Email**, habilite
+"Email + Password" (ou Magic Link). Crie usuários com os mesmos `id`
+do seed para a sessão resolver o membership do escritório:
+
+```sql
+-- Run in Supabase SQL editor; trigger the email signup with a known UUID.
+-- (Or use the Auth API admin endpoint to create users with `id = 'u-1'`.)
 ```
 
-Cada página vira client-component (ou usa hidratação SSR via
-`createServerSideHelpers`).
+Após isso, o `/login` passa a chamar `signInWithPassword` real e o
+`lib/auth.ts` retorna a sessão verdadeira em vez do stub.
 
-### 6. Habilitar RLS server-side
+### 6. (Opcional) RLS para multi-tenant
 
-Para multi-tenant com Supabase:
+Quando o escritório for multi-tenant, ative Row Level Security:
 
 ```sql
 ALTER TABLE "Matter" ENABLE ROW LEVEL SECURITY;
+
 CREATE POLICY tenant_isolation ON "Matter"
-  USING (office_id = auth.uid_office_id());
+  USING (
+    "officeId" IN (
+      SELECT "officeId" FROM "User"
+      WHERE id::text = auth.uid()::text
+    )
+  );
+
+-- Repita para Client, Lead, Document, Invoice, AuditLog, etc.
 ```
 
-(função custom mapeando `auth.uid()` → `officeId` via `User`)
+(Opcional v1: rodar single-tenant e adiar RLS para v1.5.)
 
-### 7. SquadRuns assíncronos via Inngest (F6.2.x)
-
-Vercel timeout de 60s mata Squad Runs reais (>1min). Antes de chamar LLM
-real, configurar Inngest:
+## Comandos disponíveis
 
 ```bash
-npm install inngest
+npm run db:generate    # Prisma Client
+npm run db:migrate     # nova migration interativa
+npm run db:push        # sincroniza schema sem migration (dev rápido)
+npm run db:studio      # Prisma Studio (GUI no localhost:5555)
+npm run db:seed        # popula com dados dos mocks
 ```
 
-E os `squads.start` mutations enfileiram `inngest.send({ name: "squad/run" })`
-em vez de rodar inline.
-
-## Anatomia do tRPC neste projeto
+## Anatomia técnica
 
 ```
 lib/
+├─ env.ts                      # SUPABASE_ENABLED, BACKEND_ENABLED flags
 ├─ db.ts                       # Prisma client singleton (lazy)
-├─ auth.ts                     # getCurrentUser() — stub agora, Supabase em F6.2
+├─ auth.ts                     # getCurrentUser() — dual-mode
+├─ supabase/
+│  ├─ client.ts                # browser client (login form)
+│  ├─ server.ts                # SSR client (Server Components, tRPC)
+│  └─ middleware.ts            # session refresh helper
 └─ trpc/
-   ├─ context.ts               # createContext() injeta { user, db } em cada request
-   ├─ server.ts                # initTRPC + middlewares de papel (RBAC)
-   ├─ client.tsx               # createTRPCReact + Provider (client component)
-   └─ routers/
-      ├─ _app.ts               # appRouter + AppRouter type
-      ├─ matters.ts
-      ├─ leads.ts
-      ├─ clients.ts
-      ├─ squads.ts
-      └─ audit.ts
+   ├─ context.ts               # createContext({ user, db })
+   ├─ server.ts                # initTRPC + RBAC middlewares
+   ├─ client.tsx               # createTRPCReact + Provider
+   └─ routers/                 # matters, leads, clients, squads, audit
 
-app/
-├─ api/trpc/[trpc]/route.ts    # fetch handler (Next App Router)
-└─ (app)/
-   ├─ providers.tsx            # <TRPCProvider> client wrapper
-   └─ layout.tsx               # envolve children com <Providers>
+middleware.ts                  # root middleware → updateSession()
+prisma/
+├─ schema.prisma               # 17 models + enums
+└─ seed.ts                     # popula com mocks (npm run db:seed)
 ```
 
-## Próximos passos (F6.2 → F8)
+## Próximas sub-fases
 
 | Sub-fase | Escopo |
 | --- | --- |
-| **F6.1** ✅ | Schema + tRPC scaffold (você está aqui) |
-| **F6.2** | Postgres real + Prisma calls nos routers + Supabase Auth + seed |
-| **F6.3** | Migrar componentes UI dos mocks para `trpc.*.useQuery` |
-| **F6.4** | Inngest para SquadRuns + Realtime para HITL push |
-| **F7** | Já entregue como UI; backend cobre faturamento + RBAC enforcement |
-| **F8** | Playwright e2e + Lighthouse + deploy production Vercel |
+| **F6.1** ✅ | Schema + tRPC scaffold + dual-mode env |
+| **F6.2** ✅ | Supabase Auth integrado + seed pronto + middleware de sessão |
+| **F6.3** | Substituir os imports diretos de mocks nas páginas por `trpc.*.useQuery()` (~7 páginas) |
+| **F6.4** | Inngest para SquadRuns + Supabase Realtime para HITL push |
+| **F8** | Playwright e2e + Lighthouse + production deploy Vercel |
+
+## Troubleshooting
+
+### "Database is not available"
+
+Confirme que `DATABASE_URL` está em `.env.local` (não `.env.example`) e
+que a senha está URL-encoded (`@` → `%40`, etc).
+
+### Login funciona mas componentes dão erro 500
+
+Provavelmente Supabase Auth resolveu mas `DATABASE_URL` ainda não está
+configurada — `lib/auth.ts` retorna uma sessão "magra" sem buscar perfil
+do Postgres. Configure `DATABASE_URL` ou desative Supabase temporariamente
+removendo `NEXT_PUBLIC_SUPABASE_URL` para voltar ao stub.
+
+### Build na Vercel falhando com "DATABASE_URL not set"
+
+Adicione todas as env vars em **Project Settings → Environment Variables**.
+Lembre-se de marcar `SUPABASE_SERVICE_ROLE_KEY` como _Sensitive_.
