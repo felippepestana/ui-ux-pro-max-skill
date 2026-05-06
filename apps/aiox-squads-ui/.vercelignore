@@ -1,0 +1,18 @@
+# Items ignored when Vercel pulls source for deployment.
+# Keep this aligned with .gitignore but include things that may be in Git
+# yet not needed for build (e.g. tests, docs).
+node_modules
+.next
+out
+build
+*.log
+*.tsbuildinfo
+.DS_Store
+.env
+.env*.local
+tests/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+README.md
