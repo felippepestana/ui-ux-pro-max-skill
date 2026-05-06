@@ -18,26 +18,34 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   BRL,
   BRL_DETAILED,
-  FEE_CONTRACTS,
   FEE_KIND_LABEL,
-  INVOICES,
   INVOICE_STATUS_LABEL,
   INVOICE_STATUS_VARIANT,
-  PAYMENTS,
   type FeeContract,
   type Invoice,
   type Payment,
 } from "@/lib/billing";
+import { trpc } from "@/lib/trpc/client";
 
 export default function BillingPage() {
-  const billedThisMonth = INVOICES.filter((i) =>
-    i.competenceMonth.startsWith("2026-04"),
-  ).reduce((s, i) => s + i.totalBrl, 0);
-  const receivedThisMonth = PAYMENTS.filter((p) =>
-    p.paidAt.startsWith("2026-04"),
-  ).reduce((s, p) => s + p.amountBrl, 0);
-  const overdue = INVOICES.filter((i) => i.status === "vencida");
-  const overdueTotal = overdue.reduce((s, i) => s + i.totalBrl, 0);
+  const invoicesQuery = trpc.billing.invoices.useQuery({});
+  const contractsQuery = trpc.billing.contracts.useQuery();
+  const paymentsQuery = trpc.billing.payments.useQuery();
+  const kpisQuery = trpc.billing.kpis.useQuery();
+
+  const invoices = invoicesQuery.data ?? [];
+  const contracts = contractsQuery.data ?? [];
+  const payments = paymentsQuery.data ?? [];
+  const kpis = kpisQuery.data ?? {
+    billedThisMonth: 0,
+    receivedThisMonth: 0,
+    overdueTotal: 0,
+    overdueCount: 0,
+    activeContracts: 0,
+    totalContracts: 0,
+    invoicesThisMonth: 0,
+    paymentsThisMonth: 0,
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -68,29 +76,29 @@ export default function BillingPage() {
       >
         <KpiCard
           label="Faturado abr/2026"
-          value={BRL.format(billedThisMonth)}
-          hint={`${INVOICES.filter((i) => i.competenceMonth.startsWith("2026-04")).length} faturas emitidas`}
+          value={BRL.format(kpis.billedThisMonth)}
+          hint={`${kpis.invoicesThisMonth} faturas emitidas`}
           tone="primary"
           icon={<Receipt className="h-4 w-4" />}
         />
         <KpiCard
           label="Recebido abr/2026"
-          value={BRL.format(receivedThisMonth)}
-          hint={`${PAYMENTS.filter((p) => p.paidAt.startsWith("2026-04")).length} pagamentos`}
+          value={BRL.format(kpis.receivedThisMonth)}
+          hint={`${kpis.paymentsThisMonth} pagamentos`}
           tone="success"
           icon={<Wallet className="h-4 w-4" />}
         />
         <KpiCard
           label="Em aberto vencido"
-          value={BRL.format(overdueTotal)}
-          hint={`${overdue.length} faturas vencidas`}
-          tone={overdueTotal > 0 ? "destructive" : "default"}
+          value={BRL.format(kpis.overdueTotal)}
+          hint={`${kpis.overdueCount} faturas vencidas`}
+          tone={kpis.overdueTotal > 0 ? "destructive" : "default"}
           icon={<AlertCircle className="h-4 w-4" />}
         />
         <KpiCard
           label="Contratos ativos"
-          value={String(FEE_CONTRACTS.filter((c) => c.status === "ativo").length)}
-          hint={`${FEE_CONTRACTS.length} no total`}
+          value={String(kpis.activeContracts)}
+          hint={`${kpis.totalContracts} no total`}
           tone="accent"
           icon={<TrendingUp className="h-4 w-4" />}
         />
@@ -105,13 +113,13 @@ export default function BillingPage() {
         </TabsList>
 
         <TabsContent value="invoices" className="mt-0">
-          <InvoicesTable invoices={INVOICES} />
+          <InvoicesTable invoices={invoices} />
         </TabsContent>
         <TabsContent value="contracts" className="mt-0">
-          <ContractsTable contracts={FEE_CONTRACTS} />
+          <ContractsTable contracts={contracts} />
         </TabsContent>
         <TabsContent value="payments" className="mt-0">
-          <PaymentsTable payments={PAYMENTS} />
+          <PaymentsTable payments={payments} />
         </TabsContent>
         <TabsContent value="reports" className="mt-0">
           <Card>

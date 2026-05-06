@@ -24,11 +24,11 @@ import {
 import { SquadLauncherButton } from "@/components/squads/squad-launcher-button";
 import {
   DOCUMENTS,
-  getDocumentById,
   KIND_LABEL,
   STATUS_LABEL,
   STATUS_VARIANT,
 } from "@/lib/documents";
+import { createServerCaller } from "@/lib/trpc/server-caller";
 
 export function generateStaticParams() {
   return DOCUMENTS.map((d) => ({ id: d.id }));
@@ -40,7 +40,8 @@ export default async function DocumentDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const doc = getDocumentById(id);
+  const trpc = await createServerCaller();
+  const doc = await trpc.documents.byId({ id }).catch(() => null);
   if (!doc) notFound();
 
   const currentV = doc.versions.find((v) => v.version === doc.currentVersion);

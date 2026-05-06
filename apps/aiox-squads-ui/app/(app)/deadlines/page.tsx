@@ -33,6 +33,7 @@ import {
   type Deadline,
   type DeadlineStatus,
 } from "@/lib/deadlines";
+import { trpc } from "@/lib/trpc/client";
 
 const STATUS_VARIANT: Record<
   DeadlineStatus,
@@ -53,26 +54,34 @@ export default function DeadlinesPage() {
   >("all");
   const [criticalOnly, setCriticalOnly] = React.useState(false);
 
+  const deadlinesQuery = trpc.deadlines.list.useQuery({});
+  const allDeadlines = React.useMemo(
+    () => deadlinesQuery.data ?? [],
+    [deadlinesQuery.data],
+  );
+
   const filtered = React.useMemo<Deadline[]>(() => {
-    return DEADLINES.filter((d) => {
-      if (criticalOnly && !isCritical(d)) return false;
-      if (statusFilter !== "all" && d.status !== statusFilter) return false;
-      if (selected) {
-        const dueDate = new Date(d.dueAt).toDateString();
-        if (dueDate !== selected.toDateString()) return false;
-      }
-      if (search) {
-        const q = search.toLowerCase();
-        const haystack =
-          `${d.title} ${d.matterCode} ${d.matterClient} ${d.court} ${d.responsibleName}`.toLowerCase();
-        if (!haystack.includes(q)) return false;
-      }
-      return true;
-    }).sort(
-      (a, b) =>
-        new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime(),
-    );
-  }, [search, statusFilter, criticalOnly, selected]);
+    return allDeadlines
+      .filter((d) => {
+        if (criticalOnly && !isCritical(d)) return false;
+        if (statusFilter !== "all" && d.status !== statusFilter) return false;
+        if (selected) {
+          const dueDate = new Date(d.dueAt).toDateString();
+          if (dueDate !== selected.toDateString()) return false;
+        }
+        if (search) {
+          const q = search.toLowerCase();
+          const haystack =
+            `${d.title} ${d.matterCode} ${d.matterClient} ${d.court} ${d.responsibleName}`.toLowerCase();
+          if (!haystack.includes(q)) return false;
+        }
+        return true;
+      })
+      .sort(
+        (a, b) =>
+          new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime(),
+      );
+  }, [allDeadlines, search, statusFilter, criticalOnly, selected]);
 
   const stats = {
     total: DEADLINES.length,
@@ -156,7 +165,7 @@ export default function DeadlinesPage() {
 
       <div className="grid gap-6 xl:grid-cols-[420px_minmax(0,1fr)]">
         <DeadlineCalendar
-          deadlines={DEADLINES}
+          deadlines={allDeadlines.length ? allDeadlines : DEADLINES}
           anchor={anchor}
           selected={selected}
           onSelect={setSelected}

@@ -27,17 +27,27 @@ import {
   ASSIGNEES,
   PRIORITY_LABEL,
   PRIORITY_VARIANT,
-  TASKS,
   TASK_STAGES,
   type Task,
   type TaskPriority,
   type TaskStatus,
 } from "@/lib/tasks";
+import { trpc } from "@/lib/trpc/client";
 
 type View = "kanban" | "list";
 
 export default function TasksPage() {
-  const [items, setItems] = React.useState<Task[]>(TASKS);
+  const tasksQuery = trpc.tasks.list.useQuery({});
+  const [localOverrides, setLocalOverrides] = React.useState<
+    Record<string, TaskStatus>
+  >({});
+  const items = React.useMemo<Task[]>(() => {
+    const base = tasksQuery.data ?? [];
+    if (Object.keys(localOverrides).length === 0) return base;
+    return base.map((t) =>
+      localOverrides[t.id] ? { ...t, status: localOverrides[t.id]! } : t,
+    );
+  }, [tasksQuery.data, localOverrides]);
   const [view, setView] = React.useState<View>("kanban");
   const [search, setSearch] = React.useState("");
   const [priorityFilter, setPriorityFilter] = React.useState<TaskPriority | "all">(
@@ -61,7 +71,7 @@ export default function TasksPage() {
   }, [items, search, priorityFilter, assigneeFilter]);
 
   function moveTask(id: string, status: TaskStatus) {
-    setItems((prev) => prev.map((t) => (t.id === id ? { ...t, status } : t)));
+    setLocalOverrides((prev) => ({ ...prev, [id]: status }));
     const task = items.find((t) => t.id === id);
     const stage = TASK_STAGES.find((s) => s.key === status);
     if (task && stage) {

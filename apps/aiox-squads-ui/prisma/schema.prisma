@@ -20,8 +20,12 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  // Pooled URL used at runtime (PgBouncer in transaction mode).
+  url       = env("DATABASE_URL")
+  // Direct connection used by Prisma Migrate. Required by Supabase since
+  // migrations cannot run through the pooler.
+  directUrl = env("DIRECT_URL")
 }
 
 // ─── Tenant + identity ────────────────────────────────────────────────

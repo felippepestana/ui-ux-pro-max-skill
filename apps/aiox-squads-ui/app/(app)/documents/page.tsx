@@ -17,35 +17,20 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  DOCUMENTS,
   KIND_LABEL,
   STATUS_LABEL,
   STATUS_VARIANT,
-  TEMPLATES,
   type DocumentItem,
   type DocumentTemplate,
 } from "@/lib/documents";
+import { trpc } from "@/lib/trpc/client";
 
 export default function DocumentsPage() {
   const [search, setSearch] = React.useState("");
-
-  const filteredDocs = React.useMemo<DocumentItem[]>(() => {
-    if (!search) return DOCUMENTS;
-    const q = search.toLowerCase();
-    return DOCUMENTS.filter((d) =>
-      `${d.title} ${d.matterCode} ${d.matterClient}`
-        .toLowerCase()
-        .includes(q),
-    );
-  }, [search]);
-
-  const filteredTpls = React.useMemo<DocumentTemplate[]>(() => {
-    if (!search) return TEMPLATES;
-    const q = search.toLowerCase();
-    return TEMPLATES.filter((t) =>
-      `${t.title} ${t.area} ${t.description}`.toLowerCase().includes(q),
-    );
-  }, [search]);
+  const docsQuery = trpc.documents.list.useQuery({ search });
+  const tplsQuery = trpc.documents.templates.useQuery({ search });
+  const filteredDocs: DocumentItem[] = docsQuery.data ?? [];
+  const filteredTpls: DocumentTemplate[] = tplsQuery.data ?? [];
 
   return (
     <div className="flex flex-col gap-6">
