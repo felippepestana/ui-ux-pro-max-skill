@@ -18,7 +18,6 @@ import {
 import {
   AREAS,
   BRL,
-  MATTERS,
   PRIORITY_LABEL,
   STATUS_LABEL,
   type Matter,
@@ -26,6 +25,7 @@ import {
   type MatterPriority,
   type MatterStatus,
 } from "@/lib/matters";
+import { trpc } from "@/lib/trpc/client";
 
 const PRIORITY_VARIANT: Record<
   MatterPriority,
@@ -55,8 +55,19 @@ export default function MattersPage() {
   const [status, setStatus] = React.useState<MatterStatus | "all">("all");
   const [criticalOnly, setCriticalOnly] = React.useState(false);
 
+  // Server-side filtering happens in the tRPC router; client-side filters
+  // refine the result further (area + criticalOnly aren't part of the
+  // tRPC schema yet — they will be in F6.4).
+  const mattersQuery = trpc.matters.list.useQuery({});
+  const matters = React.useMemo(
+    () => mattersQuery.data ?? [],
+    [mattersQuery.data],
+  );
+  const allMattersQuery = trpc.matters.count.useQuery();
+  const totalMatters = allMattersQuery.data ?? matters.length;
+
   const filtered = React.useMemo<Matter[]>(() => {
-    return MATTERS.filter((matter) => {
+    return matters.filter((matter) => {
       if (criticalOnly && !(matter.nextDeadline && matter.nextDeadline.hoursLeft <= 72)) {
         return false;
       }
@@ -69,7 +80,7 @@ export default function MattersPage() {
       }
       return true;
     });
-  }, [area, status, criticalOnly, search]);
+  }, [matters, area, status, criticalOnly, search]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -80,7 +91,8 @@ export default function MattersPage() {
           </p>
           <h1 className="mt-1 font-serif text-4xl">Casos</h1>
           <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-            {MATTERS.length} casos no escritório · {filtered.length} visíveis
+            {totalMatters} casos no escritório · {filtered.length} visíveis
+            {mattersQuery.isLoading && " · carregando…"}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

@@ -21,8 +21,9 @@ import {
   ContextualSidebar,
   type ContextualSidebarSection,
 } from "@/components/contextual-sidebar/contextual-sidebar";
-import { CLIENTS, getClientById, type ClientConflictStatus } from "@/lib/clients";
-import { getMatterById, STATUS_LABEL, BRL } from "@/lib/matters";
+import { CLIENTS, type ClientConflictStatus } from "@/lib/clients";
+import { STATUS_LABEL, BRL } from "@/lib/matters";
+import { createServerCaller } from "@/lib/trpc/server-caller";
 
 const CONFLICT_VARIANT: Record<
   ClientConflictStatus,
@@ -49,12 +50,17 @@ export default async function ClientDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const client = getClientById(id);
+  const trpc = await createServerCaller();
+  const client = await trpc.clients.byId({ id }).catch(() => null);
   if (!client) notFound();
 
-  const matters = client.matterIds
-    .map((mid) => getMatterById(mid))
-    .filter((m): m is NonNullable<typeof m> => !!m);
+  const matters = (
+    await Promise.all(
+      client.matterIds.map((mid) =>
+        trpc.matters.byId({ id: mid }).catch(() => null),
+      ),
+    )
+  ).filter((m): m is NonNullable<typeof m> => !!m);
 
   const sections: ContextualSidebarSection[] = [
     {

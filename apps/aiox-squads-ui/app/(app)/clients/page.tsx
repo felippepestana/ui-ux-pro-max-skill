@@ -15,7 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CLIENTS, type Client, type ClientKind, type ClientConflictStatus } from "@/lib/clients";
+import { type Client, type ClientKind, type ClientConflictStatus } from "@/lib/clients";
+import { trpc } from "@/lib/trpc/client";
 
 const BRL = new Intl.NumberFormat("pt-BR", {
   style: "currency",
@@ -45,8 +46,14 @@ export default function ClientsPage() {
     ClientConflictStatus | "all"
   >("all");
 
+  const clientsQuery = trpc.clients.list.useQuery({});
+  const allClients = React.useMemo(
+    () => clientsQuery.data ?? [],
+    [clientsQuery.data],
+  );
+
   const filtered = React.useMemo<Client[]>(() => {
-    return CLIENTS.filter((c) => {
+    return allClients.filter((c) => {
       if (kind !== "all" && c.kind !== kind) return false;
       if (conflictStatus !== "all" && c.conflictStatus !== conflictStatus)
         return false;
@@ -58,7 +65,7 @@ export default function ClientsPage() {
       }
       return true;
     });
-  }, [kind, conflictStatus, search]);
+  }, [allClients, kind, conflictStatus, search]);
 
   const totalOutstanding = filtered.reduce((sum, c) => sum + c.outstandingBrl, 0);
 
@@ -71,8 +78,9 @@ export default function ClientsPage() {
           </p>
           <h1 className="mt-1 font-serif text-4xl">Clientes</h1>
           <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-            {CLIENTS.length} cadastrados · {filtered.length} visíveis ·{" "}
+            {allClients.length} cadastrados · {filtered.length} visíveis ·{" "}
             <strong>{BRL.format(totalOutstanding)}</strong> em aberto
+            {clientsQuery.isLoading && " · carregando…"}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

@@ -17,12 +17,12 @@ import {
   ACTION_LABEL,
   ACTOR_LABEL,
   ACTOR_VARIANT,
-  AUDIT_EVENTS,
   ENTITY_LABEL,
   type AuditActorType,
   type AuditEntityType,
   type AuditEvent,
 } from "@/lib/audit";
+import { trpc } from "@/lib/trpc/client";
 
 export default function AuditPage() {
   const [search, setSearch] = React.useState("");
@@ -32,8 +32,14 @@ export default function AuditPage() {
   );
   const [expandedId, setExpandedId] = React.useState<string | null>(null);
 
+  const auditQuery = trpc.audit.list.useQuery({});
+  const allEvents = React.useMemo(
+    () => auditQuery.data ?? [],
+    [auditQuery.data],
+  );
+
   const filtered = React.useMemo<AuditEvent[]>(() => {
-    return AUDIT_EVENTS.filter((e) => {
+    return allEvents.filter((e) => {
       if (actorType !== "all" && e.actorType !== actorType) return false;
       if (entityType !== "all" && e.entityType !== entityType) return false;
       if (search) {
@@ -43,7 +49,7 @@ export default function AuditPage() {
       }
       return true;
     });
-  }, [actorType, entityType, search]);
+  }, [allEvents, actorType, entityType, search]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -54,9 +60,10 @@ export default function AuditPage() {
           </p>
           <h1 className="mt-1 font-serif text-4xl">Trilhas de auditoria</h1>
           <p className="mt-2 max-w-3xl text-sm text-[var(--muted-foreground)]">
-            {AUDIT_EVENTS.length} eventos registrados · {filtered.length}{" "}
+            {allEvents.length} eventos registrados · {filtered.length}{" "}
             visíveis. Toda mutação é logada com origem (humano/squad/sistema)
             e diff antes/depois quando aplicável.
+            {auditQuery.isLoading && " · carregando…"}
           </p>
         </div>
         <Button variant="outline" size="sm">

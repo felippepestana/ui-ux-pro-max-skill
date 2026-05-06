@@ -11,7 +11,8 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { getSquadIcon } from "@/lib/squad-icons";
-import { getSquadById, SQUADS } from "@/lib/squads";
+import { SQUADS } from "@/lib/squads";
+import { createServerCaller } from "@/lib/trpc/server-caller";
 
 export function generateStaticParams() {
   return SQUADS.map((squad) => ({ id: squad.id }));
@@ -23,7 +24,8 @@ export default async function SquadDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const squad = getSquadById(id);
+  const trpc = await createServerCaller();
+  const squad = await trpc.squads.byId({ id }).catch(() => null);
   if (!squad) notFound();
 
   const Icon = getSquadIcon(squad.iconKey);

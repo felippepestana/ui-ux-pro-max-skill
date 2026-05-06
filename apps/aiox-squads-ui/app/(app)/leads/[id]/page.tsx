@@ -20,7 +20,8 @@ import {
   type ContextualSidebarSection,
 } from "@/components/contextual-sidebar/contextual-sidebar";
 import { SquadLauncherButton } from "@/components/squads/squad-launcher-button";
-import { getLeadById, LEADS, SOURCE_LABEL, STAGES } from "@/lib/leads";
+import { LEADS, SOURCE_LABEL, STAGES } from "@/lib/leads";
+import { createServerCaller } from "@/lib/trpc/server-caller";
 
 const BRL = new Intl.NumberFormat("pt-BR", {
   style: "currency",
@@ -46,7 +47,8 @@ export default async function LeadDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const lead = getLeadById(id);
+  const trpc = await createServerCaller();
+  const lead = await trpc.leads.byId({ id }).catch(() => null);
   if (!lead) notFound();
 
   const stage = STAGES.find((s) => s.key === lead.stage);

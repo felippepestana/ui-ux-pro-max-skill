@@ -25,12 +25,13 @@ import {
 import { SquadLauncherButton } from "@/components/squads/squad-launcher-button";
 import {
   BRL,
-  getMatterById,
   MATTERS,
   PRIORITY_LABEL,
   STATUS_LABEL,
+  type Matter,
 } from "@/lib/matters";
-import { ACTIVE_RUNS, getSquadById } from "@/lib/squads";
+import { ACTIVE_RUNS } from "@/lib/squads";
+import { createServerCaller } from "@/lib/trpc/server-caller";
 
 const PRIORITY_VARIANT = {
   critical: "destructive",
@@ -58,13 +59,16 @@ export default async function MatterDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const matter = getMatterById(id);
+  const trpc = await createServerCaller();
+  const matter = await trpc.matters.byId({ id }).catch(() => null);
   if (!matter) notFound();
 
   const activeRun = matter.activeSquadRunId
     ? ACTIVE_RUNS.find((run) => run.id === matter.activeSquadRunId)
     : undefined;
-  const activeSquad = activeRun ? getSquadById(activeRun.squadId) : undefined;
+  const activeSquad = activeRun
+    ? await trpc.squads.byId({ id: activeRun.squadId }).catch(() => null)
+    : null;
 
   const sections: ContextualSidebarSection[] = [
     {
@@ -293,7 +297,7 @@ function TimelineItem({
   );
 }
 
-function SummarySection({ matter }: { matter: ReturnType<typeof getMatterById> }) {
+function SummarySection({ matter }: { matter: Matter | null | undefined }) {
   if (!matter) return null;
   return (
     <dl className="space-y-2 text-sm">

@@ -1,9 +1,12 @@
 import { SquadCard } from "@/components/squads/squad-card";
-import { SQUADS } from "@/lib/squads";
+import { createServerCaller } from "@/lib/trpc/server-caller";
 
 export const metadata = { title: "Squads" };
 
-export default function SquadsCatalogPage() {
+export default async function SquadsCatalogPage() {
+  const trpc = await createServerCaller();
+  const squads = await trpc.squads.list();
+
   return (
     <div className="flex flex-col gap-8">
       <header>
@@ -19,7 +22,7 @@ export default function SquadsCatalogPage() {
       </header>
 
       <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {SQUADS.map((squad) => (
+        {squads.map((squad) => (
           <li key={squad.id} className="flex">
             <SquadCard squad={squad} />
           </li>

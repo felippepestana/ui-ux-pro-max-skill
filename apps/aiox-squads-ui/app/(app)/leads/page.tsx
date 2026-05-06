@@ -8,7 +8,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { KanbanBoard } from "@/components/kanban/kanban-board";
 import { LeadCard } from "@/components/leads/lead-card";
-import { LEADS, STAGES, type Lead, type LeadStage } from "@/lib/leads";
+import { STAGES, type Lead, type LeadStage } from "@/lib/leads";
+import { trpc } from "@/lib/trpc/client";
 
 const BRL = new Intl.NumberFormat("pt-BR", {
   style: "currency",
@@ -17,8 +18,21 @@ const BRL = new Intl.NumberFormat("pt-BR", {
 });
 
 export default function LeadsPage() {
-  const [items, setItems] = React.useState<Lead[]>(LEADS);
+  const leadsQuery = trpc.leads.list.useQuery({});
+  const [localOverrides, setLocalOverrides] = React.useState<
+    Record<string, LeadStage>
+  >({});
   const [search, setSearch] = React.useState("");
+
+  // Merge server data with local stage overrides (optimistic moves until
+  // F6.4 wires the leads.move mutation with TanStack Query invalidation).
+  const items = React.useMemo<Lead[]>(() => {
+    const base = leadsQuery.data ?? [];
+    if (Object.keys(localOverrides).length === 0) return base;
+    return base.map((l) =>
+      localOverrides[l.id] ? { ...l, stage: localOverrides[l.id]! } : l,
+    );
+  }, [leadsQuery.data, localOverrides]);
 
   const filtered = React.useMemo(() => {
     if (!search) return items;
@@ -33,9 +47,7 @@ export default function LeadsPage() {
   }, [items, search]);
 
   function moveLead(id: string, stage: LeadStage) {
-    setItems((prev) =>
-      prev.map((lead) => (lead.id === id ? { ...lead, stage } : lead)),
-    );
+    setLocalOverrides((prev) => ({ ...prev, [id]: stage }));
     const lead = items.find((l) => l.id === id);
     const stageMeta = STAGES.find((s) => s.key === stage);
     if (lead && stageMeta) {
@@ -68,6 +80,7 @@ export default function LeadsPage() {
             {items.length} oportunidades · {filtered.length} visíveis ·{" "}
             <strong>{BRL.format(totalPipeline)}</strong> em pipeline ·{" "}
             {conversionRate}% taxa de aceite
+            {leadsQuery.isLoading && " · carregando…"}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
