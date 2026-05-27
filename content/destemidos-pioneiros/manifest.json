@@ -1,0 +1,91 @@
+{
+  "event": {
+    "name": "TOP 1270 — Destemidos Pioneiros",
+    "movement": "Movimento Legendários",
+    "edition_number": 1270,
+    "theme": "Destemidos Pioneiros",
+    "location": {
+      "city": "Porto Velho",
+      "state": "RO",
+      "country": "BR"
+    },
+    "dates": {
+      "start": "2025-10-02",
+      "end":   "2025-10-05",
+      "format": "4 dias e 3 noites"
+    },
+    "investment": {
+      "currency": "BRL",
+      "min": 1800,
+      "max": 1850,
+      "includes": [
+        "Alimentação completa",
+        "Uniforme oficial",
+        "Boné do TOP",
+        "Material da jornada",
+        "Hospedagem em campo"
+      ]
+    },
+    "registration": {
+      "status": "encerrada",
+      "channels": [
+        { "type": "instagram",  "handle": "@legendariosportovelho", "url": "https://www.instagram.com/legendariosportovelho/" },
+        { "type": "site_oficial", "url": "https://legendarios.org.br/" }
+      ]
+    }
+  },
+  "movement": {
+    "founded": {
+      "country": "Guatemala",
+      "year": 2015,
+      "date": "2015-07-23",
+      "founder": "Chepe Putzu",
+      "founding_church": "Casa de Dios"
+    },
+    "brazil": {
+      "arrival_year": 2017,
+      "first_top": {
+        "year": 2018,
+        "month": "novembro",
+        "city": "Balneário Camboriú",
+        "state": "SC",
+        "name": "Pioneiros Brasil"
+      }
+    },
+    "scale": {
+      "global_members_approx": 90000,
+      "brazil_members_approx": 25000,
+      "brazil_states": 18,
+      "countries_active_approx": 15
+    },
+    "methodology": {
+      "duration_hours": 72,
+      "format": "Trilha imersiva em montanha (4 dias / 3 noites)",
+      "pillars": ["físico", "emocional", "espiritual"],
+      "purpose": "Transformar homens, famílias e comunidades despertando a melhor versão e reconectando ao propósito"
+    }
+  },
+  "regional_anchors": {
+    "hino_rondonia_verso": "Somos destemidos pioneiros",
+    "monumento": {
+      "nome": "Monumento Destemido Pioneiro",
+      "artista": "Bruno Souza",
+      "altura_m": 3.6,
+      "peso_t": 3,
+      "material": "concreto armado",
+      "alude_a": "Estrada de Ferro Madeira-Mamoré (EFMM)"
+    },
+    "porto_velho": {
+      "fundacao_oficial": "1914-10-02",
+      "fundadores_pioneiros_aprox": "1907 — construção da Madeira-Mamoré",
+      "111_anos_em": "2025-10-02"
+    },
+    "terminal_rodoviario": {
+      "nome": "Terminal Rodoviário Destemidos Pioneiros",
+      "inauguracao": "2024-12-31",
+      "espera_anos": 40,
+      "significado": "marco histórico da capital"
+    }
+  },
+  "provenance_note": "Dados compilados via WebSearch em 2026-05-27. Fontes em sources/_PROVENIENCIA.md."
+}

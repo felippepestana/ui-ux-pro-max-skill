@@ -1,0 +1,151 @@
+/* TOP 1270 — Destemidos Pioneiros · brand tokens
+   Mirrors content/destemidos-pioneiros/brand/palette.json + typography.json */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap');
+
+[data-site="destemidos-pioneiros"] {
+  /* primary */
+  --dp-ink:    #0a0a0a;
+  --dp-blood:  #b3151a;
+  --dp-bone:   #f5efe6;
+
+  /* regional */
+  --dp-jungle: #2c5238;
+  --dp-clay:   #c08457;
+  --dp-river:  #16323b;
+
+  /* neutrals */
+  --dp-n-900: #0a0a0a;
+  --dp-n-800: #1f1f1f;
+  --dp-n-700: #3a3a3a;
+  --dp-n-500: #6a6a6a;
+  --dp-n-400: #a1a1a1;
+  --dp-n-300: #cfcfcf;
+  --dp-n-200: #e6e0d6;
+  --dp-n-100: #f5efe6;
+
+  /* type */
+  --dp-display: 'Cormorant Garamond', Georgia, serif;
+  --dp-text:    'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+
+  /* shape */
+  --dp-radius-sm: 4px;
+  --dp-radius:    8px;
+  --dp-radius-lg: 16px;
+
+  font-family: var(--dp-text);
+  color: var(--dp-ink);
+  background: var(--dp-bone);
+  font-feature-settings: 'cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
+}
+
+[data-site="destemidos-pioneiros"] h1,
+[data-site="destemidos-pioneiros"] h2,
+[data-site="destemidos-pioneiros"] h3,
+[data-site="destemidos-pioneiros"] .dp-display {
+  font-family: var(--dp-display);
+  letter-spacing: -0.01em;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+[data-site="destemidos-pioneiros"] .dp-eyebrow {
+  font-family: var(--dp-text);
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--dp-blood);
+}
+
+[data-site="destemidos-pioneiros"] .dp-quote {
+  font-family: var(--dp-display);
+  font-style: italic;
+  font-size: 1.5rem;
+  line-height: 1.4;
+  color: var(--dp-n-800);
+  border-left: 3px solid var(--dp-blood);
+  padding-left: 1.25rem;
+}
+
+[data-site="destemidos-pioneiros"] .dp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.4rem;
+  border-radius: var(--dp-radius);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  transition: transform 120ms ease, background 120ms ease, color 120ms ease;
+  text-decoration: none;
+  cursor: pointer;
+  border: 0;
+}
+[data-site="destemidos-pioneiros"] .dp-btn-primary {
+  background: var(--dp-blood);
+  color: var(--dp-bone);
+}
+[data-site="destemidos-pioneiros"] .dp-btn-primary:hover { transform: translateY(-1px); background: #951116; }
+[data-site="destemidos-pioneiros"] .dp-btn-ghost {
+  background: transparent;
+  color: var(--dp-ink);
+  border: 1px solid currentColor;
+}
+[data-site="destemidos-pioneiros"] .dp-btn-ghost:hover { background: var(--dp-ink); color: var(--dp-bone); }
+
+[data-site="destemidos-pioneiros"] .dp-section {
+  padding: clamp(3.5rem, 8vw, 7rem) 1.25rem;
+}
+[data-site="destemidos-pioneiros"] .dp-container {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+[data-site="destemidos-pioneiros"] .dp-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--dp-n-300), transparent);
+  margin: 2rem 0;
+}
+
+[data-site="destemidos-pioneiros"] .dp-card {
+  background: white;
+  border: 1px solid var(--dp-n-200);
+  border-radius: var(--dp-radius-lg);
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+[data-site="destemidos-pioneiros"] .dp-tag {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  background: var(--dp-n-200);
+  color: var(--dp-n-800);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+[data-site="destemidos-pioneiros"] a { color: var(--dp-blood); }
+[data-site="destemidos-pioneiros"] a:hover { text-decoration: underline; }
+
+/* dark hero block */
+[data-site="destemidos-pioneiros"] .dp-onyx {
+  background: var(--dp-ink);
+  color: var(--dp-bone);
+}
+[data-site="destemidos-pioneiros"] .dp-onyx .dp-eyebrow { color: var(--dp-clay); }
+[data-site="destemidos-pioneiros"] .dp-onyx a { color: var(--dp-bone); }
+
+/* responsive type */
+[data-site="destemidos-pioneiros"] .dp-h1 { font-size: clamp(2.75rem, 7vw, 5rem); }
+[data-site="destemidos-pioneiros"] .dp-h2 { font-size: clamp(2rem, 4.5vw, 3rem); }
+[data-site="destemidos-pioneiros"] .dp-lead { font-size: clamp(1.05rem, 1.6vw, 1.25rem); line-height: 1.6; color: var(--dp-n-700); max-width: 65ch; }
+
+[data-site="destemidos-pioneiros"] .dp-grid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
