@@ -10,9 +10,19 @@ const NAV = [
   { href: '#historia',      label: 'Por que Destemidos' },
   { href: '#metodologia',   label: 'Metodologia' },
   { href: '#programacao',   label: 'Programação' },
+  { href: '#kit',           label: 'O que levar' },
   { href: '#inscricao',     label: 'Inscrição' },
   { href: '#faq',           label: 'FAQ' },
   { href: '#contato',       label: 'Contato' },
+]
+
+const KIT = [
+  { title: 'Mochila',    items: 'Até 60 L · ~14 kg no total · capa impermeável' },
+  { title: 'Roupas',     items: 'Calça esportiva (sem jeans) · manga curta e longa · jaqueta impermeável · luvas · meias' },
+  { title: 'Acampar',    items: 'Copo de alumínio · talheres · garrafa + 1 L de água · sem alimentos' },
+  { title: 'Higiene',    items: 'Toalha · papel higiênico · pomada para assaduras · repelente · protetor solar' },
+  { title: 'Específicos',items: 'Lanterna de cabeça + pilhas · Bíblia (impermeável, obrigatória) · 5 ziplocks · ~200 g de cal' },
+  { title: 'Proibido',   items: 'Lâminas cortantes · eletrônicos — você fica incomunicável durante todo o TOP' },
 ]
 
 const PHASES = [
@@ -40,6 +50,8 @@ const FAQ = [
     a: 'Ninguém é deixado para trás. Há equipe médica e logística em todos os pontos. Já vimos homens de 60 anos, sedentários, com sobrepeso, concluírem o TOP.' },
   { q: 'Posso levar acompanhante?',
     a: 'A travessia é estritamente individual. A família participa apenas da cerimônia de entrega, no domingo à tarde.' },
+  { q: 'Preciso levar Bíblia?',
+    a: 'Sim — a Bíblia é item obrigatório, em embalagem impermeável. A trilha também proíbe lâminas cortantes e qualquer alimento (salvo dieta restrita). A lista completa é enviada após a confirmação.' },
 ]
 
 export default function DestemidosPioneirosSite() {
@@ -217,6 +229,25 @@ export default function DestemidosPioneirosSite() {
               <p style={{ color: 'var(--dp-n-700)', marginTop: '0.4rem' }}>Descida em formação · Cerimônia de entrega de medalhas e juramento legendário · Encerramento e reencontro com as famílias · Porto Velho 111 anos.</p>
             </li>
           </ol>
+        </div>
+      </section>
+
+      {/* O que levar */}
+      <section id="kit" className="dp-section">
+        <div className="dp-container">
+          <div className="dp-eyebrow">O que levar</div>
+          <h2 className="dp-h2" style={{ marginTop: '0.75rem' }}>A montanha tem regras.</h2>
+          <p className="dp-lead" style={{ marginTop: '1rem' }}>
+            Guia geral baseado no padrão dos TOPs. A lista oficial e definitiva é enviada pela equipe Pioneiros Porto Velho após a confirmação da inscrição.
+          </p>
+          <div className="dp-grid" style={{ marginTop: '2rem' }}>
+            {KIT.map(k => (
+              <div key={k.title} className="dp-card">
+                <h3 className="dp-display" style={{ fontSize: '1.2rem', color: k.title === 'Proibido' ? 'var(--dp-blood)' : 'var(--dp-ink)' }}>{k.title}</h3>
+                <p style={{ marginTop: '0.5rem', color: 'var(--dp-n-700)', lineHeight: 1.6 }}>{k.items}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

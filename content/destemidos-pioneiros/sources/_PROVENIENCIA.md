@@ -19,6 +19,17 @@ Mapa de cada trecho do kit para sua origem pública. Coletado via `WebSearch` em
 | Datas 02-05/out/2025, Porto Velho/RO, investimento R$ 1.800-1.850, inclui alimentação, uniforme, boné | [Na Hora Online (idem)](https://www.nahoraonline.com/movimento-legendarios-anuncia-evento-em-porto-velho-com-foco-em-espiritualidade-e-transformacao-pessoal/) |
 | Numeração da edição: TOP 1270 | [Instagram @legendariosportovelho](https://www.instagram.com/legendariosportovelho/) · [Reel de encerramento](https://www.instagram.com/reel/DPcDFmyDg39/) |
 | Perfil oficial PVH: @legendariosportovelho (2.431 seguidores, 44 posts na coleta) | [Instagram @legendariosportovelho](https://www.instagram.com/legendariosportovelho/) |
+| Organizador/porta-voz: empresário Alan Dalazen (construção, pecuária, semijoias) | [Na Hora Online (idem)](https://www.nahoraonline.com/movimento-legendarios-anuncia-evento-em-porto-velho-com-foco-em-espiritualidade-e-transformacao-pessoal/) |
+| Apoio: 25+ igrejas locais + equipes de Balneário Camboriú e Manaus | [Na Hora Online (idem)](https://www.nahoraonline.com/movimento-legendarios-anuncia-evento-em-porto-velho-com-foco-em-espiritualidade-e-transformacao-pessoal/) |
+| Escala revista (2025): 150 mil no mundo, metade no Brasil (varia por fonte vs. 90 mil) | [Na Hora Online (idem)](https://www.nahoraonline.com/movimento-legendarios-anuncia-evento-em-porto-velho-com-foco-em-espiritualidade-e-transformacao-pessoal/) |
+
+## Regras e equipamento ("o que levar")
+
+| Trecho | Fonte |
+|---|---|
+| Mochila máx. 60 L / ~14 kg, sem jeans, lanterna de cabeça, Bíblia obrigatória impermeável, sem lâminas, ziplock, 200 g de cal, incomunicável | [Legendários BR — Vou para o próximo TOP, o que levar?](https://legendariosbr.com.br/vou-para-o-proximo-top-o-que-preciso-levar/) · [Legendários (PDF oficial) — TOP Transformação, o que levar](https://legendarios.org.br/wp-content/uploads/2023/03/TOP-TRANSFORMACAO_.pdf) · [Legendários Rio — O que levar 2025 (PDF)](https://legendariosrio.com.br/wp-content/uploads/2025/04/o-que-levar-legendarios-rio-2025-05-b.pdf) |
+| Camiseta laranja simboliza esforço, perseverança e transformação | [Diário do Nordeste — Entenda o que são os Legendários](https://diariodonordeste.verdesmares.com.br/entretenimento/zoeira/eliezer-compartilha-experiencia-em-retiro-espiritual-em-montanha-entenda-o-que-sao-os-legendarios-1.3638301) · [Los Legendarios (oficial)](https://www.loslegendarios.org/) |
+| Sigla TOP: "Trilha de Oportunidades e Propósitos" vs "Track Outdoor de Potencial" (sem padronização) | [Gazeta do Povo](https://www.gazetadopovo.com.br/vida-e-cidadania/tres-liderancas-legendarios-no-brasil/) · [Patos do Sul — o que levar na mochila](https://patosdosul.com.br/blogs/blog-da-patos/legendarios-o-que-levar-na-mochila) |
 
 ## "Destemidos Pioneiros" — referência regional
 

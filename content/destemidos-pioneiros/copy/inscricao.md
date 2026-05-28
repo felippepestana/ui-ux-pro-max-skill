@@ -26,6 +26,10 @@ Homens maiores de **18 anos** dispostos a se entregar integralmente ao processo.
 
 - **TOP Warriors** — para solteiros de **18 a 30 anos** que ainda não tiveram união estável/casamento. Investimento reduzido (a partir de **R$ 1.490**).
 
+## Quem organiza
+
+A chegada do movimento a Porto Velho foi apresentada pelo empresário **Alan Dalazen**. A edição tem o apoio de **mais de 25 igrejas locais** e de **equipes de Balneário Camboriú (SC) e Manaus (AM)**, com experiência em TOPs anteriores.
+
 ## Como se inscrever
 
 As inscrições para o TOP 1270 foram processadas pelo time **Pioneiros Porto Velho**. Para a próxima edição ou para entrar na lista de interesse:

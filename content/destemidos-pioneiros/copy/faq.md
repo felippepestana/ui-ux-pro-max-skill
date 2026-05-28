@@ -28,6 +28,10 @@ Recomendamos chegar na **quarta-feira (01/10)** para descansar e checar equipame
 
 A travessia é estritamente individual. O TOP é só para o participante. A família pode estar presente apenas na **cerimônia de entrega**, no domingo à tarde.
 
+## Preciso levar Bíblia?
+
+Sim — a Bíblia é item **obrigatório**, em embalagem impermeável. A trilha também proíbe lâminas cortantes de qualquer tipo e qualquer alimento (salvo dieta restrita comprovada). A lista completa de equipamento é enviada após a confirmação. Veja o guia "O que levar".
+
 ## Como sei que isso é sério?
 
-O Movimento Legendários existe desde 2015 e, no Brasil, desde 2017. Já são mais de 25 mil Legendários formados em 18 estados. Em Porto Velho, esta é a edição **1270** do movimento — número que fala por si.
+O Movimento Legendários existe desde 2015 e, no Brasil, desde 2017. Já são dezenas de milhares de Legendários formados — fontes citam de 90 mil a 150 mil participantes no mundo, com o Brasil concentrando boa parte deles, em 18 estados. Em Porto Velho, esta é a edição **1270** do movimento, com apoio de mais de 25 igrejas locais e de equipes de Balneário Camboriú e Manaus.

@@ -32,6 +32,19 @@
         { "type": "instagram",  "handle": "@legendariosportovelho", "url": "https://www.instagram.com/legendariosportovelho/" },
         { "type": "site_oficial", "url": "https://legendarios.org.br/" }
       ]
+    },
+    "organization": {
+      "spokesperson": "Alan Dalazen",
+      "spokesperson_note": "Empresário (construção, pecuária, semijoias) que apresentou a chegada do movimento a Porto Velho",
+      "support": "Mais de 25 igrejas locais, além de equipes de Balneário Camboriú (SC) e Manaus (AM), já experientes em edições anteriores"
+    },
+    "rules": {
+      "incommunicado": true,
+      "bible_required": true,
+      "blades_forbidden": true,
+      "backpack_max_liters": 60,
+      "backpack_target_weight_kg": 14,
+      "shirt_symbol": "Camiseta laranja simboliza esforço, perseverança e transformação"
     }
   },
   "movement": {
@@ -54,10 +67,13 @@
     },
     "scale": {
       "global_members_approx": 90000,
+      "global_members_high_estimate": 150000,
       "brazil_members_approx": 25000,
+      "brazil_share_note": "Algumas fontes (2025) citam 150 mil no mundo, com metade no Brasil — números variam por fonte",
       "brazil_states": 18,
       "countries_active_approx": 15
     },
+    "acronym_note": "A sigla TOP aparece em fontes como 'Trilha de Oportunidades e Propósitos' e também como 'Track Outdoor de Potencial' — não há padronização única.",
     "methodology": {
       "duration_hours": 72,
       "format": "Trilha imersiva em montanha (4 dias / 3 noites)",

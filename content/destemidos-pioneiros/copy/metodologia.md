@@ -15,6 +15,10 @@ A trilha é exigente por desenho. Cada estação ao longo do caminho propõe um 
 - **Dia 3 — Travessia.** O ponto mais alto. A noite mais longa. A escolha que define o resto.
 - **Dia 4 — Retorno.** Descida em formação. Cerimônia de entrega. O homem volta com outro nome.
 
+## A camiseta laranja
+
+Ao concluir a travessia, o homem recebe a **camiseta laranja** — símbolo de esforço, perseverança e transformação. Não se compra: conquista-se na montanha. É a marca visível de que ali subiu um homem e desceu um Legendário.
+
 ## O que muda
 
 Quem passa por um TOP relata uma coisa em comum: a relação com a própria casa muda. O marido reaprende a olhar para a esposa. O pai redescobre o filho. O sócio enxerga o sócio. O movimento aposta que **transformar comunidades começa por curar o homem** — e que isso só acontece em corpo, em montanha, em coletivo.

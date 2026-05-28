@@ -14,7 +14,11 @@ Em **2017**, o movimento desembarcou em solo brasileiro. O primeiro TOP foi real
 
 ## O que é um TOP
 
-TOP é a sigla de **Trilha de Oportunidades e Propósitos** — o desafio central do movimento. Quatro dias e três noites de subida a uma montanha, conduzidos por uma metodologia que articula corpo, emoção e espírito. Cada edição recebe um nome próprio e um número sequencial. Em Porto Velho, o número é 1270 — e o nome, **Destemidos Pioneiros**.
+TOP é o desafio central do movimento — quatro dias e três noites de subida a uma montanha, conduzidos por uma metodologia que articula corpo, emoção e espírito. A sigla aparece em fontes como *Trilha de Oportunidades e Propósitos* e também como *Track Outdoor de Potencial*; o que não muda é a essência: travessia. Cada edição recebe um nome próprio e um número sequencial. Em Porto Velho, o número é 1270 — e o nome, **Destemidos Pioneiros**.
+
+## Quem traz o TOP 1270 a Porto Velho
+
+A chegada do movimento à capital foi apresentada pelo empresário **Alan Dalazen** (construção, pecuária e semijoias). A edição conta com o apoio de **mais de 25 igrejas locais**, além de **equipes de Balneário Camboriú (SC) e Manaus (AM)** — já experientes em edições anteriores — que dão suporte à organização da trilha.
 
 ## Âncora regional
 
