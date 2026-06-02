@@ -112,6 +112,9 @@ When modifying files:
    mkdir -p cli/assets/skills/design-md
    cp -r src/design-md/* cli/assets/skills/design-md/
    ```
+   `cli/assets/skills/` is gitignored — it's a publish-time bundle regenerated
+   from `src/design-md/`, not version-controlled (avoids duplicating the full
+   package + tests in git).
 
 6. **Reference Folders** - No manual sync needed. The CLI generates these from templates during `uipro init`.
 
