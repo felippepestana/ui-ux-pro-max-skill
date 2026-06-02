@@ -55,10 +55,14 @@ export default function TrilhaPage() {
   }
 
   async function buscar() {
-    const q = buscaSender.trim()
+    // Sanitize: inside a PostgREST .or() string, "," "(" ")" are grammar chars and
+    // "*" is the ilike wildcard — strip them so a name like "Silva, João" can't break
+    // (or inject into) the filter. PostgREST ilike uses "*" as the wildcard, not "%".
+    const q = buscaSender.trim().replace(/[,()*]/g, '')
     if (!q) return
-    const { data } = await supabase.from('senderistas').select('*')
-      .or(`nome.ilike.%${q}%,nfc_tag_id.eq.${q},cpf.ilike.%${q}%`).limit(8)
+    const { data, error } = await supabase.from('senderistas').select('*')
+      .or(`nome.ilike.*${q}*,nfc_tag_id.eq.${q},cpf.ilike.*${q}*`).limit(8)
+    if (error) { setMsg(`Erro na busca: ${error.message}`); return }
     setAchados(data ?? [])
   }
 
