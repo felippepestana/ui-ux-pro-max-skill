@@ -95,7 +95,11 @@ export default function InscricaoPage() {
       .insert(payload)
       .select('upload_token, mensagens_token, classificacao_risco')
       .single()
-    if (error) { setErro(`Não foi possível concluir a inscrição: ${error.message}`); return }
+    if (error) {
+      console.error('[InscricaoPage] insert failed:', error)
+      setErro('Não foi possível concluir a inscrição. Tente novamente ou fale com a organização.')
+      return
+    }
     setDone({ upload_token: data.upload_token, mensagens_token: data.mensagens_token, risco: data.classificacao_risco })
   }
 

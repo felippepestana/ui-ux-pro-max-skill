@@ -125,7 +125,7 @@ export default function TrilhaPage() {
       {ativs.map(a => (
         <div key={a.id} className="dp-card" style={{ marginBottom: '0.5rem', display: 'flex', justifyContent: 'space-between' }}>
           <span><strong>{a.nome}</strong> <span style={{ color: 'var(--dp-n-500)' }}>· {a.tipo}</span></span>
-          <span style={{ color: 'var(--dp-n-500)', fontSize: '0.85rem' }}>{a.localizacao_lat ? `${a.localizacao_lat.toFixed(4)}, ${a.localizacao_lng?.toFixed(4)}` : 'sem GPS'}</span>
+          <span style={{ color: 'var(--dp-n-500)', fontSize: '0.85rem' }}>{a.localizacao_lat != null && a.localizacao_lng != null ? `${a.localizacao_lat.toFixed(4)}, ${a.localizacao_lng.toFixed(4)}` : 'sem GPS'}</span>
         </div>
       ))}
     </PainelLayout>

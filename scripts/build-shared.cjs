@@ -9,7 +9,7 @@ const path = require('path');
 const SHARED = path.resolve(__dirname, '..', 'src', 'shared');
 
 function parseCsv(text) {
-  const lines  = text.trim().split('\n');
+  const lines  = text.trim().split(/\r?\n/);
   const header = lines[0].split(',');
   return lines.slice(1).map(line => {
     // Naive CSV splitter that respects quoted fields containing commas

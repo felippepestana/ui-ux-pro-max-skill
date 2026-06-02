@@ -35,10 +35,12 @@ $$;
 revoke all on function public.get_senderista_publico(uuid) from public;
 grant execute on function public.get_senderista_publico(uuid) to anon, authenticated;
 
+drop policy if exists "exames_insert_anon" on storage.objects;
 create policy "exames_insert_anon" on storage.objects
   for insert to anon
   with check (bucket_id = 'exames');
 
+drop policy if exists "mensagens_insert_anon" on storage.objects;
 create policy "mensagens_insert_anon" on storage.objects
   for insert to anon
   with check (bucket_id = 'mensagens');

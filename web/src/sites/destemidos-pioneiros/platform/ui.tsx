@@ -62,8 +62,9 @@ export function Banner({ kind, children }: { kind: 'info' | 'success' | 'error' 
   const colors: Record<string, string> = {
     info: 'var(--dp-river)', success: 'var(--dp-jungle)', error: 'var(--dp-blood)', warning: 'var(--dp-clay)',
   }
+  const role = kind === 'error' || kind === 'warning' ? 'alert' : 'status'
   return (
-    <div role="status" style={{
+    <div role={role} style={{
       borderLeft: `4px solid ${colors[kind]}`, background: 'white',
       padding: '0.85rem 1rem', borderRadius: 'var(--dp-radius)', marginBottom: '1rem',
       color: 'var(--dp-n-800)', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',

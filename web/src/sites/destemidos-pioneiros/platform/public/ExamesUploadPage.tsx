@@ -23,7 +23,8 @@ export default function ExamesUploadPage() {
     if (error) { setErro(error); setLoading(false); return }
     setSenderista(data)
     if (data) {
-      const { data: ex } = await supabase.from('exames').select('*').eq('senderista_id', data.id).order('created_at', { ascending: false })
+      const { data: ex, error: exErr } = await supabase.from('exames').select('*').eq('senderista_id', data.id).order('created_at', { ascending: false })
+      if (exErr) setErro(exErr.message)
       setExames(ex ?? [])
       const exigidos = data.exames_exigidos as TipoExame[]
       if (exigidos?.length) setTipo(exigidos[0])
@@ -31,7 +32,8 @@ export default function ExamesUploadPage() {
     setLoading(false)
   }
 
-  useEffect(() => { load() /* eslint-disable-next-line */ }, [upload_token])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { load() }, [upload_token])
 
   async function enviar() {
     if (!senderista || !file) return

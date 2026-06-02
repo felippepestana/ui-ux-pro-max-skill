@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import './theme.css'
 
 // Microsite TOP 1270 — Destemidos Pioneiros
@@ -92,7 +93,7 @@ export default function DestemidosPioneirosSite() {
             Quatro dias. Três noites. Uma montanha. Uma travessia para encontrar a melhor versão do homem que mora dentro de você — no mesmo chão onde os pioneiros do Norte ergueram uma capital do zero.
           </p>
           <div style={{ display: 'flex', gap: '0.75rem', marginTop: '2rem', flexWrap: 'wrap' }}>
-            <a href="/destemidos-pioneiros/inscricao" className="dp-btn dp-btn-primary">Quero ser um Legendário →</a>
+            <Link to="/destemidos-pioneiros/inscricao" className="dp-btn dp-btn-primary">Quero ser um Legendário →</Link>
             <a href="#sobre" className="dp-btn dp-btn-ghost" style={{ color: 'var(--dp-bone)' }}>Conheça o TOP 1270</a>
           </div>
           <div style={{ marginTop: '3rem', display: 'flex', alignItems: 'center', gap: '0.6rem', color: 'var(--dp-clay)' }}>

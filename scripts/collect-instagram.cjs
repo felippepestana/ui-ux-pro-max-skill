@@ -45,12 +45,14 @@ if (!SESSION) {
 
 function get(url, headers) {
   return new Promise((resolve, reject) => {
-    https.get(url, { headers }, (res) => {
+    const req = https.get(url, { headers, timeout: 15000 }, (res) => {
       const chunks = [];
       res.on('data', c => chunks.push(c));
       res.on('end', () => resolve({ status: res.statusCode, body: Buffer.concat(chunks) }));
       res.on('error', reject);
-    }).on('error', reject);
+    });
+    req.on('timeout', () => req.destroy(new Error(`Request timed out: ${url}`)));
+    req.on('error', reject);
   });
 }
 
