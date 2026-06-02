@@ -331,6 +331,14 @@ export type Database = {
           evento_nome: string | null
         }[]
       }
+      get_senderista_mensagens: {
+        Args: { p_token: string }
+        Returns: {
+          id: string
+          nome: string
+          evento_nome: string | null
+        }[]
+      }
     }
     Enums: { [_ in never]: never }
     CompositeTypes: { [_ in never]: never }

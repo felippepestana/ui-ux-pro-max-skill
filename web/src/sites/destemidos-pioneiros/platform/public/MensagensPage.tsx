@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { uploadToBucket } from '../lib/storage'
-import { fetchSenderistaPorToken, type SenderistaPublico } from '../lib/senderistaToken'
+import { fetchSenderistaMensagens, type SenderistaMensagens } from '../lib/senderistaToken'
 import { PlatformShell, Field, inputStyle, Banner, Spinner } from '../ui'
 
 type TipoMsg = 'carta' | 'foto' | 'video' | 'audio'
@@ -15,7 +15,7 @@ const TIPOS: { id: TipoMsg; label: string; accept?: string }[] = [
 
 export default function MensagensPage() {
   const { mensagens_token = '' } = useParams()
-  const [senderista, setSenderista] = useState<SenderistaPublico | null>(null)
+  const [senderista, setSenderista] = useState<SenderistaMensagens | null>(null)
   const [loading, setLoading] = useState(true)
   const [erro, setErro] = useState<string | null>(null)
   const [ok, setOk] = useState(false)
@@ -28,7 +28,7 @@ export default function MensagensPage() {
   const [file, setFile] = useState<File | null>(null)
 
   useEffect(() => {
-    fetchSenderistaPorToken(mensagens_token).then(({ data, error }) => {
+    fetchSenderistaMensagens(mensagens_token).then(({ data, error }) => {
       setSenderista(data); setErro(error); setLoading(false)
     })
   }, [mensagens_token])
