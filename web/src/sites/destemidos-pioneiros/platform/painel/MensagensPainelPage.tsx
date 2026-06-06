@@ -35,12 +35,14 @@ export default function MensagensPainelPage() {
   useEffect(() => { load() /* eslint-disable-next-line */ }, [filtro])
 
   async function marcar(id: string) {
+    setMsg(null)
     const { error } = await supabase.from('mensagens_apoio').update({ visualizado: true, visualizado_em: new Date().toISOString() }).eq('id', id)
     if (error) { setMsg(`Erro: ${error.message}`); return }
     await load()
   }
 
   async function abrir(arquivo_url: string) {
+    setMsg(null)
     const url = await signedUrl('mensagens', arquivo_url)
     if (url) window.open(url, '_blank', 'noopener')
     else setMsg('Não foi possível abrir o arquivo.')

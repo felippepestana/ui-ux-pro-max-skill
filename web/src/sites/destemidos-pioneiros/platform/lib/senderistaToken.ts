@@ -25,9 +25,17 @@ type Result<T> = { data: T | null; error: string | null }
 
 function unwrap<T>(data: unknown, error: { message: string } | null): Result<T> {
   if (error) {
-    const msg = /function .* does not exist/i.test(error.message)
-      ? 'O portal ainda não foi habilitado pela organização (migração de banco pendente).'
-      : error.message
+    // Never forward raw RPC error.message to the public portals — it can leak
+    // backend internals (UUID parse traces, function metadata, stack info). Map
+    // to safe, user-facing strings; keep the migration hint because it tells
+    // the operator something specific they can fix.
+    console.error('[senderistaToken] rpc failed', error)
+    let msg = 'Não foi possível validar o link no momento. Tente novamente em instantes.'
+    if (/function .* does not exist/i.test(error.message)) {
+      msg = 'O portal ainda não foi habilitado pela organização (migração de banco pendente).'
+    } else if (/invalid input syntax for type uuid|22P02/i.test(error.message)) {
+      msg = 'Link inválido ou expirado.'
+    }
     return { data: null, error: msg }
   }
   const row = Array.isArray(data) ? data[0] : data

@@ -24,6 +24,8 @@ as $$
   where s.upload_token = p_token
   limit 1;
 $$;
+revoke all on function public.get_senderista_publico(uuid) from public;
+grant execute on function public.get_senderista_publico(uuid) to anon, authenticated;
 
 -- P1 — family-messages portal: mensagens_token only, minimal columns (who to address).
 create or replace function public.get_senderista_mensagens(p_token uuid)
