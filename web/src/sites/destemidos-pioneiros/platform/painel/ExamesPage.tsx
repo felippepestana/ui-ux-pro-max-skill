@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../auth/AuthProvider'
 import { PainelLayout } from './PainelLayout'
-import { Spinner, Banner } from '../ui'
+import { Spinner, Banner, EmptyState } from '../ui'
 import { signedUrl } from '../lib/storage'
 import { TIPOS_EXAME, type TipoExame } from '../lib/risco'
 
@@ -18,13 +18,22 @@ export default function ExamesPage() {
   const [loading, setLoading] = useState(true)
   const [filtro, setFiltro] = useState<'pendentes' | 'todos'>('pendentes')
   const [msg, setMsg] = useState<string | null>(null)
+  const [erro, setErro] = useState<string | null>(null)
 
   async function load() {
     setLoading(true)
     let q = supabase.from('exames').select('*, senderistas(nome)').order('created_at', { ascending: true })
     if (filtro === 'pendentes') q = q.is('validado', null)
-    const { data } = await q
-    setRows((data as unknown as ExameRow[]) ?? []); setLoading(false)
+    const { data, error } = await q
+    if (error) {
+      console.error('[exames] load failed', error)
+      setErro('Não foi possível carregar os exames. Tente recarregar a página.')
+      setRows([])
+    } else {
+      setErro(null)
+      setRows((data as unknown as ExameRow[]) ?? [])
+    }
+    setLoading(false)
   }
   useEffect(() => { load() /* eslint-disable-next-line */ }, [filtro])
 
@@ -51,12 +60,18 @@ export default function ExamesPage() {
 
   return (
     <PainelLayout title="Validação de exames">
+      {erro && <Banner kind="error">{erro}</Banner>}
       {msg && <Banner kind="error">{msg}</Banner>}
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-        <button className={`dp-btn ${filtro === 'pendentes' ? 'dp-btn-primary' : 'dp-btn-ghost'}`} onClick={() => setFiltro('pendentes')}>Pendentes</button>
-        <button className={`dp-btn ${filtro === 'todos' ? 'dp-btn-primary' : 'dp-btn-ghost'}`} onClick={() => setFiltro('todos')}>Todos</button>
+      <div role="tablist" aria-label="Filtro de exames" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+        <button role="tab" aria-selected={filtro === 'pendentes'} className={`dp-btn ${filtro === 'pendentes' ? 'dp-btn-primary' : 'dp-btn-ghost'}`} onClick={() => setFiltro('pendentes')}>Pendentes</button>
+        <button role="tab" aria-selected={filtro === 'todos'} className={`dp-btn ${filtro === 'todos' ? 'dp-btn-primary' : 'dp-btn-ghost'}`} onClick={() => setFiltro('todos')}>Todos</button>
       </div>
-      {rows.length === 0 && <p style={{ color: 'var(--dp-n-500)' }}>Nenhum exame {filtro === 'pendentes' ? 'pendente' : ''}.</p>}
+      {rows.length === 0 && !erro && (
+        <EmptyState
+          title={filtro === 'pendentes' ? 'Sem exames pendentes' : 'Nenhum exame enviado ainda'}
+          description={filtro === 'pendentes' ? 'Todos foram validados — bom trabalho.' : 'Quando um senderista enviar pelo portal de exames, ele aparece aqui.'}
+        />
+      )}
       {rows.map(e => (
         <div key={e.id} className="dp-card" style={{ marginBottom: '0.6rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
           <div>

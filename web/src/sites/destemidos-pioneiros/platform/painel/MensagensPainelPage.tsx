@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { PainelLayout } from './PainelLayout'
-import { Spinner, Banner } from '../ui'
+import { Spinner, Banner, EmptyState } from '../ui'
 import { signedUrl } from '../lib/storage'
 
 interface MsgRow {
@@ -15,13 +15,22 @@ export default function MensagensPainelPage() {
   const [loading, setLoading] = useState(true)
   const [filtro, setFiltro] = useState<'novas' | 'todas'>('novas')
   const [msg, setMsg] = useState<string | null>(null)
+  const [erro, setErro] = useState<string | null>(null)
 
   async function load() {
     setLoading(true)
     let q = supabase.from('mensagens_apoio').select('*, senderistas(nome)').order('created_at', { ascending: false })
     if (filtro === 'novas') q = q.eq('visualizado', false)
-    const { data } = await q
-    setRows((data as unknown as MsgRow[]) ?? []); setLoading(false)
+    const { data, error } = await q
+    if (error) {
+      console.error('[mensagens] load failed', error)
+      setErro('Não foi possível carregar as mensagens. Tente recarregar a página.')
+      setRows([])
+    } else {
+      setErro(null)
+      setRows((data as unknown as MsgRow[]) ?? [])
+    }
+    setLoading(false)
   }
   useEffect(() => { load() /* eslint-disable-next-line */ }, [filtro])
 
@@ -41,12 +50,18 @@ export default function MensagensPainelPage() {
 
   return (
     <PainelLayout title="Mensagens de apoio">
+      {erro && <Banner kind="error">{erro}</Banner>}
       {msg && <Banner kind="error">{msg}</Banner>}
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-        <button className={`dp-btn ${filtro === 'novas' ? 'dp-btn-primary' : 'dp-btn-ghost'}`} onClick={() => setFiltro('novas')}>Não entregues</button>
-        <button className={`dp-btn ${filtro === 'todas' ? 'dp-btn-primary' : 'dp-btn-ghost'}`} onClick={() => setFiltro('todas')}>Todas</button>
+      <div role="tablist" aria-label="Filtro de mensagens" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+        <button role="tab" aria-selected={filtro === 'novas'} className={`dp-btn ${filtro === 'novas' ? 'dp-btn-primary' : 'dp-btn-ghost'}`} onClick={() => setFiltro('novas')}>Não entregues</button>
+        <button role="tab" aria-selected={filtro === 'todas'} className={`dp-btn ${filtro === 'todas' ? 'dp-btn-primary' : 'dp-btn-ghost'}`} onClick={() => setFiltro('todas')}>Todas</button>
       </div>
-      {rows.length === 0 && <p style={{ color: 'var(--dp-n-500)' }}>Nenhuma mensagem.</p>}
+      {rows.length === 0 && !erro && (
+        <EmptyState
+          title={filtro === 'novas' ? 'Todas as mensagens já foram entregues' : 'Nenhuma mensagem ainda'}
+          description={filtro === 'novas' ? 'Quando uma família enviar pelo portal /mensagens, ela aparece aqui.' : 'O portal /mensagens/:token alimenta esta lista.'}
+        />
+      )}
       {rows.map(m => (
         <div key={m.id} className="dp-card" style={{ marginBottom: '0.6rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>

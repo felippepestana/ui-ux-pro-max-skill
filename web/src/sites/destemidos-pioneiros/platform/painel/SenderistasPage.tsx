@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { PainelLayout } from './PainelLayout'
-import { Spinner, Banner, inputStyle } from '../ui'
+import { Spinner, Banner, EmptyState, inputStyle } from '../ui'
 import { RISCO_COR, RISCO_LABEL, TIPOS_EXAME, type TipoExame } from '../lib/risco'
 import type { Senderista } from '../database.types'
 
@@ -15,11 +15,20 @@ export default function SenderistasPage() {
   const [busca, setBusca] = useState('')
   const [sel, setSel] = useState<Senderista | null>(null)
   const [msg, setMsg] = useState<string | null>(null)
+  const [erro, setErro] = useState<string | null>(null)
 
   async function load() {
     setLoading(true)
-    const { data } = await supabase.from('senderistas').select('*').order('created_at', { ascending: false })
-    setRows(data ?? []); setLoading(false)
+    const { data, error } = await supabase.from('senderistas').select('*').order('created_at', { ascending: false })
+    if (error) {
+      console.error('[senderistas] load failed', error)
+      setErro('Não foi possível carregar a lista. Tente recarregar a página.')
+      setRows([])
+    } else {
+      setErro(null)
+      setRows(data ?? [])
+    }
+    setLoading(false)
   }
   useEffect(() => { load() }, [])
 
@@ -42,6 +51,7 @@ export default function SenderistasPage() {
 
   return (
     <PainelLayout title={`Senderistas (${rows.length})`}>
+      {erro && <Banner kind="error">{erro}</Banner>}
       {msg && <Banner kind={msg.startsWith('Erro') ? 'error' : 'success'}>{msg}</Banner>}
       <input style={{ ...inputStyle, maxWidth: 360, marginBottom: '1rem' }} placeholder="Buscar por nome, CPF, e-mail…" value={busca} onChange={e => setBusca(e.target.value)} />
 
@@ -62,7 +72,16 @@ export default function SenderistasPage() {
                   <td style={td}>{r.status}</td>
                 </tr>
               ))}
-              {filtrados.length === 0 && <tr><td style={td} colSpan={4}>Nenhum senderista encontrado.</td></tr>}
+              {filtrados.length === 0 && !erro && (
+                <tr>
+                  <td style={td} colSpan={4}>
+                    <EmptyState
+                      title={busca ? 'Nenhum senderista bate com a busca' : 'Ainda sem inscrições'}
+                      description={busca ? 'Ajuste o termo ou limpe o campo para ver todos.' : 'Assim que alguém preencher /inscricao, aparece aqui.'}
+                    />
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

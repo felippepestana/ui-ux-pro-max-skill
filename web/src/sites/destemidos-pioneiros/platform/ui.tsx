@@ -73,5 +73,28 @@ export function Banner({ kind, children }: { kind: 'info' | 'success' | 'error' 
 }
 
 export function Spinner({ label = 'Carregando…' }: { label?: string }) {
-  return <p style={{ color: 'var(--dp-n-500)', padding: '2rem 0' }}>{label}</p>
+  return (
+    <p role="status" aria-live="polite" style={{ color: 'var(--dp-n-500)', padding: '2rem 0' }}>
+      {label}
+    </p>
+  )
+}
+
+export function EmptyState({ title, description, action }: {
+  title: string
+  description?: string
+  action?: ReactNode
+}) {
+  return (
+    <div role="status" style={{
+      textAlign: 'center', padding: '2.5rem 1rem', background: 'white',
+      borderRadius: 'var(--dp-radius)', border: '1px dashed var(--dp-n-300)',
+    }}>
+      <p className="dp-display" style={{ fontSize: '1.1rem', margin: 0 }}>{title}</p>
+      {description && (
+        <p style={{ color: 'var(--dp-n-600)', fontSize: '0.9rem', margin: '0.4rem 0 0' }}>{description}</p>
+      )}
+      {action && <div style={{ marginTop: '1rem' }}>{action}</div>}
+    </div>
+  )
 }

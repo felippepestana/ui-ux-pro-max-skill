@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../auth/AuthProvider'
 import { PainelLayout } from './PainelLayout'
-import { Spinner, Banner, Field, inputStyle } from '../ui'
+import { Spinner, Banner, EmptyState, Field, inputStyle } from '../ui'
 import type { AtividadeTop, Senderista } from '../database.types'
 
 const TIPOS_ATIV = ['predica', 'hidratacao', 'acampamento', 'checkpoint', 'chegada', 'saida', 'outro']
@@ -12,6 +12,7 @@ export default function TrilhaPage() {
   const [ativs, setAtivs] = useState<AtividadeTop[]>([])
   const [loading, setLoading] = useState(true)
   const [msg, setMsg] = useState<string | null>(null)
+  const [erro, setErro] = useState<string | null>(null)
 
   // create activity
   const [nome, setNome] = useState('')
@@ -27,9 +28,16 @@ export default function TrilhaPage() {
 
   async function load() {
     setLoading(true)
-    const { data } = await supabase.from('atividades_top').select('*').order('created_at', { ascending: false })
-    setAtivs(data ?? [])
-    if (data?.[0] && !ativSel) setAtivSel(data[0].id)
+    const { data, error } = await supabase.from('atividades_top').select('*').order('created_at', { ascending: false })
+    if (error) {
+      console.error('[trilha] load failed', error)
+      setErro('Não foi possível carregar as atividades. Tente recarregar a página.')
+      setAtivs([])
+    } else {
+      setErro(null)
+      setAtivs(data ?? [])
+      if (data?.[0] && !ativSel) setAtivSel(data[0].id)
+    }
     setLoading(false)
   }
   useEffect(() => { load() /* eslint-disable-next-line */ }, [])
@@ -79,6 +87,7 @@ export default function TrilhaPage() {
 
   return (
     <PainelLayout title="Trilha & checkpoints">
+      {erro && <Banner kind="error">{erro}</Banner>}
       {msg && <Banner kind={msg.startsWith('Erro') ? 'error' : 'success'}>{msg}</Banner>}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: '1.25rem' }}>
@@ -122,6 +131,12 @@ export default function TrilhaPage() {
       </div>
 
       <h3 className="dp-display" style={{ fontSize: '1.1rem', margin: '1.5rem 0 0.5rem' }}>Atividades ({ativs.length})</h3>
+      {ativs.length === 0 && !erro && (
+        <EmptyState
+          title="Nenhuma atividade cadastrada"
+          description="Use o cartão acima para criar o primeiro checkpoint (prédica, hidratação, acampamento, chegada…)."
+        />
+      )}
       {ativs.map(a => (
         <div key={a.id} className="dp-card" style={{ marginBottom: '0.5rem', display: 'flex', justifyContent: 'space-between' }}>
           <span><strong>{a.nome}</strong> <span style={{ color: 'var(--dp-n-500)' }}>· {a.tipo}</span></span>
