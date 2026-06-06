@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Moon, Sun, RotateCcw } from 'lucide-react'
+import { Analytics } from '@vercel/analytics/react'
 import { useDesignSystem } from './hooks/useDesignSystem'
 import { ProductSelector } from './components/ProductSelector'
 import { StyleSelector } from './components/StyleSelector'
@@ -125,6 +126,8 @@ function App() {
       <footer className="border-t border-gray-200 dark:border-slate-700 mt-12 py-6 text-center text-gray-600 dark:text-gray-400 text-sm">
         <p>UI/UX Pro Max Editor v2.5.0 • Desenvolvido com ❤️</p>
       </footer>
+      
+      <Analytics />
     </div>
   )
 }
