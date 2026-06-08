@@ -15,7 +15,7 @@ O que você mandar por aqui chega até ele. O staff entrega as mensagens nos mom
 - **Carta** — texto livre. Sem limite de tamanho. Escreva o que precisar ser escrito.
 - **Foto** — uma imagem que diga algo a ele neste momento. Pode ser de família, de um lugar, de uma lembrança.
 - **Áudio** — sua voz. Recomendamos algo curto (até 2 minutos), gravado num lugar sem barulho de fundo.
-- **Vídeo** — pode ser um saludo curto, uma criança falando, um cachorro abanando. Até 30 segundos funciona melhor.
+- **Vídeo** — pode ser uma saudação curta, uma criança falando, um cachorro abanando. Até 30 segundos funciona melhor.
 
 **Como funciona o sigilo:**
 Cada mensagem é lida apenas pela equipe responsável pela entrega e pelo próprio senderista. Não publicamos nada, não compartilhamos com outros familiares.
