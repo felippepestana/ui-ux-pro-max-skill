@@ -30,7 +30,7 @@ export default function ProntuarioPage() {
   useEffect(() => { load() /* eslint-disable-next-line */ }, [senderista_id])
 
   async function salvar() {
-    if (!queixas && !condutas && !fotos?.length) { setMsg('Preencha queixas, condutas ou anexe fotos.'); return }
+    if (!queixas && !condutas && !fotos?.length) { setMsg('Preencha queixas, condutas ou anexe fotos antes de salvar.'); return }
     setBusy(true); setMsg(null)
     try {
       const fotos_urls: string[] = []
@@ -39,9 +39,12 @@ export default function ProntuarioPage() {
         senderista_id, hakuna_id: hakuna?.id ?? null, queixas: queixas || null, condutas: condutas || null, fotos_urls,
       })
       if (error) throw error
-      setQueixas(''); setCondutas(''); setFotos(null); setMsg('Registro salvo.')
+      setQueixas(''); setCondutas(''); setFotos(null); setMsg('Atendimento registrado no prontuário.')
       await load()
-    } catch (e: any) { setMsg(`Erro: ${e.message ?? e}`) } finally { setBusy(false) }
+    } catch (e: any) {
+      console.error('[prontuario] save failed', e)
+      setMsg('Erro: não conseguimos registrar o atendimento. Tente de novo — se persistir, fale com a coordenação médica.')
+    } finally { setBusy(false) }
   }
 
   async function verFoto(path: string) {
@@ -62,10 +65,14 @@ export default function ProntuarioPage() {
         </p>
       )}
 
+      <div className="dp-card" style={{ maxWidth: 620, marginBottom: '1rem', borderLeft: '4px solid var(--dp-river)', background: 'white', color: 'var(--dp-n-800)' }}>
+        Cada atendimento é uma <strong>linha nova</strong> no histórico — não edite registros antigos. Em <strong>Queixas</strong>, use as palavras do senderista quando puder. Em <strong>Condutas</strong>, descreva o que foi feito (medicação, encaminhamento, liberação) com horário se relevante. <strong>Fotos</strong> só quando agregam (lesão, edema, sinal clínico) — evite rosto sem necessidade.
+      </div>
+
       <div className="dp-card" style={{ maxWidth: 620, marginBottom: '1.5rem' }}>
         <h3 className="dp-display" style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>Novo atendimento</h3>
-        <Field label="Queixas"><textarea style={{ ...inputStyle, minHeight: 70 }} value={queixas} onChange={e => setQueixas(e.target.value)} /></Field>
-        <Field label="Condutas"><textarea style={{ ...inputStyle, minHeight: 70 }} value={condutas} onChange={e => setCondutas(e.target.value)} /></Field>
+        <Field label="Queixas"><textarea style={{ ...inputStyle, minHeight: 70 }} placeholder="Ex.: Dor no joelho direito há 2 horas, piora ao descer." value={queixas} onChange={e => setQueixas(e.target.value)} /></Field>
+        <Field label="Condutas"><textarea style={{ ...inputStyle, minHeight: 70 }} placeholder="Ex.: Gelo 15min, dipirona 1g VO, liberado para próxima trilha." value={condutas} onChange={e => setCondutas(e.target.value)} /></Field>
         <Field label="Fotos (opcional)"><input type="file" accept="image/*" multiple onChange={e => setFotos(e.target.files)} /></Field>
         <button className="dp-btn dp-btn-primary" disabled={busy} onClick={salvar}>{busy ? 'Salvando…' : 'Salvar atendimento'}</button>
       </div>
