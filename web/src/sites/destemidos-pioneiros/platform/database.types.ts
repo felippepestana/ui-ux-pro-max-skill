@@ -339,6 +339,10 @@ export type Database = {
           evento_nome: string | null
         }[]
       }
+      is_senderista_id: {
+        Args: { p_id: string }
+        Returns: boolean
+      }
     }
     Enums: { [_ in never]: never }
     CompositeTypes: { [_ in never]: never }
