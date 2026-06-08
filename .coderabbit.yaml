@@ -1,0 +1,10 @@
+reviews:
+  auto_review:
+    enabled: false
+  high_level_summary: false
+  poem: false
+  review_status: false
+  changed_files_summary: false
+  sequence_diagrams: false
+chat:
+  auto_reply: false
