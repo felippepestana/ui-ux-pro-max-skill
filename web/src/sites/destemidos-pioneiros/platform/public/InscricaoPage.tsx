@@ -127,6 +127,9 @@ export default function InscricaoPage() {
   return (
     <PlatformShell title="Inscrição do Senderista" subtitle={EVENTO + ' · Porto Velho/RO · 02–05 OUT 2025'} back={{ to: '/destemidos-pioneiros', label: 'Voltar ao site' }}>
       {erro && <Banner kind="error">{erro}</Banner>}
+      <div className="dp-card" style={{ maxWidth: 760, marginBottom: '1.25rem', borderLeft: '4px solid var(--dp-river)', background: 'white' }}>
+        Preencha com calma. Os dados de saúde definem sua classificação de risco e quais exames você precisa apresentar. Tudo fica em sigilo, acessível apenas à equipe médica e ao staff responsável pelo seu acompanhamento. Em caso de dúvida em algum campo, marque como você sabe hoje — a equipe revisa.
+      </div>
       <form onSubmit={handleSubmit(onSubmit)} style={{ maxWidth: 760 }}>
         <SectionTitle>1 · Dados pessoais</SectionTitle>
         <Field label="Nome completo" required>

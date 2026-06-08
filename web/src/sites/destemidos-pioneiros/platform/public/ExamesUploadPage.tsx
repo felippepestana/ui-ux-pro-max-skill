@@ -42,11 +42,12 @@ export default function ExamesUploadPage() {
       const path = await uploadToBucket('exames', senderista.id, file)
       const { error } = await supabase.from('exames').insert({ senderista_id: senderista.id, tipo, arquivo_url: path })
       if (error) throw error
-      setOk('Exame enviado! A equipe médica vai validar em breve.')
+      setOk('Exame enviado! A equipe médica vai validar em até 72 horas.')
       setFile(null)
       await load()
     } catch (e: any) {
-      setErro(`Falha no envio: ${e.message ?? e}. (Se persistir, o upload anônimo ainda não foi liberado pela organização.)`)
+      console.error('[exames-upload] failed', e)
+      setErro('Não conseguimos registrar o envio. Tente de novo em alguns instantes — se persistir, fale com o staff.')
     } finally {
       setBusy(false)
     }
@@ -75,6 +76,10 @@ export default function ExamesUploadPage() {
           ))}
           {exigidos.length === 0 && <li>Nenhum exame específico exigido até o momento.</li>}
         </ul>
+      </div>
+
+      <div className="dp-card" style={{ marginBottom: '1rem', borderLeft: '4px solid var(--dp-river)', background: 'white' }}>
+        <strong>O que aceitamos:</strong> PDF ou foto (JPG/PNG/HEIC), até 10&nbsp;MB. Foto do laudo serve, desde que esteja <strong>legível, com o nome do médico e a data visíveis</strong>. Atestados com mais de 6&nbsp;meses costumam ser reprovados — confira a validade antes de enviar.
       </div>
 
       <div className="dp-card" style={{ maxWidth: 520 }}>

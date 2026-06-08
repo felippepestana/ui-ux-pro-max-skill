@@ -9,6 +9,12 @@ import type { Exame } from '../database.types'
 const STATUS_LABEL: Record<string, string> = {
   pendente: 'Em análise', aprovado: 'Aprovado', reprovado: 'Reprovado', confirmado: 'Confirmado',
 }
+const STATUS_HINT: Record<string, string> = {
+  pendente: 'A equipe está revisando seus dados e definindo sua classificação de risco. Tempo médio: 48h.',
+  aprovado: 'Inscrição validada. Falta enviar (e ter aprovados) os exames listados abaixo.',
+  reprovado: 'A inscrição não pôde ser confirmada. Leia o motivo abaixo — se for reversível, você pode reenviar.',
+  confirmado: 'Tudo certo. Você está dentro do TOP. Aguarde o briefing do staff por WhatsApp.',
+}
 
 export default function StatusPage() {
   const { upload_token = '' } = useParams()
@@ -38,6 +44,11 @@ export default function StatusPage() {
         <div><div style={{ fontSize: '0.8rem', color: 'var(--dp-n-500)' }}>Inscrição</div><div className="dp-display" style={{ fontSize: '1.4rem' }}>{STATUS_LABEL[s.status] ?? s.status}</div></div>
         <div><div style={{ fontSize: '0.8rem', color: 'var(--dp-n-500)' }}>Risco</div><div className="dp-display" style={{ fontSize: '1.4rem', color: RISCO_COR[risco] ?? 'var(--dp-ink)' }}>{RISCO_LABEL[risco] ?? s.classificacao_risco}</div></div>
       </div>
+      {STATUS_HINT[s.status] && (
+        <div className="dp-card" style={{ marginBottom: '1rem', borderLeft: '4px solid var(--dp-river)', background: 'white', color: 'var(--dp-n-800)' }}>
+          {STATUS_HINT[s.status]}
+        </div>
+      )}
       {s.motivo_reprovacao && <Banner kind="error">Pendência: {s.motivo_reprovacao}</Banner>}
       {s.orientacoes && <Banner kind="info">{s.orientacoes}</Banner>}
 

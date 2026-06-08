@@ -48,7 +48,8 @@ export default function MensagensPage() {
       if (error) throw error
       setOk(true)
     } catch (e: any) {
-      setErro(`Falha no envio: ${e.message ?? e}. (Se persistir, o envio anônimo ainda não foi liberado pela organização.)`)
+      console.error('[mensagens] failed', e)
+      setErro('Não conseguimos registrar sua mensagem. Tente de novo em alguns instantes — se persistir, fale com o staff.')
     } finally { setBusy(false) }
   }
 
@@ -56,9 +57,9 @@ export default function MensagensPage() {
   if (!senderista) return <PlatformShell title="Mensagens de apoio"><Banner kind="error">{erro ?? 'Link inválido.'}</Banner></PlatformShell>
 
   if (ok) return (
-    <PlatformShell title="Mensagem enviada 💛">
+    <PlatformShell title="Mensagem registrada">
       <Banner kind="success">
-        Sua mensagem para <strong>{senderista.nome.split(' ')[0]}</strong> foi registrada e será entregue durante o TOP.
+        Sua mensagem para <strong>{senderista.nome.split(' ')[0]}</strong> foi registrada. A entrega acontece num dos pontos da travessia — escolhido pela equipe conforme o momento. Você pode mandar quantas quiser; cada uma é entregue em seu tempo.
       </Banner>
       <button className="dp-btn dp-btn-ghost" onClick={() => { setOk(false); setConteudo(''); setTitulo(''); setFile(null) }}>Enviar outra</button>
     </PlatformShell>
@@ -67,6 +68,9 @@ export default function MensagensPage() {
   return (
     <PlatformShell title={`Mensagem para ${senderista.nome.split(' ')[0]}`} subtitle="Será entregue na montanha, durante a travessia." back={{ to: '/destemidos-pioneiros', label: 'Site' }}>
       {erro && <Banner kind="error">{erro}</Banner>}
+      <div className="dp-card" style={{ marginBottom: '1rem', borderLeft: '4px solid var(--dp-river)', background: 'white' }}>
+        Durante os quatro dias do TOP, <strong>{senderista.nome.split(' ')[0]}</strong> fica sem celular e sem contato com casa. O que você mandar por aqui chega até ele pela mão do staff — na prédica, no acampamento, nos pontos de hidratação. Cartas, fotos, áudios e vídeos curtos funcionam.
+      </div>
       <div className="dp-card" style={{ maxWidth: 560 }}>
         <Field label="Quem está enviando?" required>
           <input style={inputStyle} value={enviadoPor} onChange={e => setEnviadoPor(e.target.value)} placeholder="Ex.: Maria (esposa)" />
