@@ -1,0 +1,20 @@
+{
+  "$comment": "Paleta proposta inicial — confirme com material oficial do Movimento quando disponível.",
+  "primary": {
+    "ink":    { "hex": "#0a0a0a", "name": "Preto Pioneiro",      "use": "Texto, headlines, fundos densos" },
+    "blood":  { "hex": "#b3151a", "name": "Vermelho Legendário", "use": "Acentos, CTAs, selos, brasão" },
+    "bone":   { "hex": "#f5efe6", "name": "Osso de Lua",         "use": "Fundo principal, papel, light surfaces" }
+  },
+  "regional": {
+    "jungle": { "hex": "#2c5238", "name": "Verde Amazônia",      "use": "Acento secundário, ícones natureza" },
+    "clay":   { "hex": "#c08457", "name": "Terra Madeira-Mamoré","use": "Detalhes vintage, divisores, badges" },
+    "river":  { "hex": "#16323b", "name": "Azul Madeira",        "use": "Cards escuros, footer, navbar opaco" }
+  },
+  "semantic": {
+    "success": { "hex": "#2c5238", "ref": "jungle" },
+    "warning": { "hex": "#c08457", "ref": "clay" },
+    "danger":  { "hex": "#b3151a", "ref": "blood" },
+    "info":    { "hex": "#16323b", "ref": "river" }
+  },
+  "neutral_scale": ["#0a0a0a", "#1f1f1f", "#3a3a3a", "#6a6a6a", "#a1a1a1", "#cfcfcf", "#e6e0d6", "#f5efe6"]
+}

@@ -33,6 +33,24 @@ An AI skill that provides design intelligence for building professional UI/UX ac
   <a href="https://nextlevelbuilder.io">NextLevelBuilder.io</a> | <a href="https://goclaw.sh">GoClaw.sh</a> | <a href="https://claudekit.cc">ClaudeKit.cc</a> | <a href="https://tose.sh">TOSE.sh</a>
 </p>
 
+## Companion skill: `design-md`
+
+This repo also ships the **`design-md`** skill — a self-contained Node 18+ pipeline that extracts a Google-spec `DESIGN.md` from any public URL via static HTML/CSS analysis (no headless browser). Source of truth at `src/design-md/`, also exposed as a skill at `.claude/skills/design-md/`.
+
+When wired through `DESIGN_MD_POST_HOOK=./scripts/design-md-post-hook.cjs`, every successful extraction is auto-catalogued in `src/ui-ux-pro-max/data/extracted-references.csv` so the BM25 search starts recommending real-world references.
+
+```bash
+npm install                                  # installs all workspaces
+node src/design-md/run.cjs --url https://stripe.com/
+# → outputs/design-md/stripe/ produced + ui-ux-pro-max catalog updated
+```
+
+See `src/design-md/INTEGRATION.md` and `ARCHITECTURE.md` for the full bridge.
+
+## Microsite: TOP 1270 — Destemidos Pioneiros
+
+The repo also hosts a self-contained editorial kit at `content/destemidos-pioneiros/` and a microsite at `web/src/sites/destemidos-pioneiros/` for the Movimento Legendários TOP 1270 event in Porto Velho/RO. Visit `/destemidos-pioneiros` on the dev server (`cd web && npm run dev`).
+
 ## What's New in v2.0
 
 ### Intelligent Design System Generation

@@ -1,0 +1,18 @@
+{
+  "name": "ui-ux-pro-max-skill",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Antigravity Kit — UI/UX design intelligence + design-md extractor + companion web editor.",
+  "workspaces": [
+    "cli",
+    "web",
+    "src/design-md"
+  ],
+  "scripts": {
+    "build-shared": "node scripts/build-shared.cjs",
+    "test:design-md": "npm test --workspace src/design-md",
+    "test:shared": "node --test src/shared/__tests__/*.test.cjs",
+    "test:node": "npm run test:design-md && npm run test:shared"
+  },
+  "license": "MIT"
+}

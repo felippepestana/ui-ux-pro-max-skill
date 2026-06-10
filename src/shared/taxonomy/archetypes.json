@@ -1,0 +1,50 @@
+{
+  "$comment": "Generated from archetypes.csv by scripts/build-shared.cjs. Do not edit by hand.",
+  "version": 1,
+  "archetypes": [
+    {
+      "id": "shadcn-neutral",
+      "name": "shadcn / Neutral"
+    },
+    {
+      "id": "carbon-enterprise",
+      "name": "IBM Carbon / Enterprise"
+    },
+    {
+      "id": "material-elevation",
+      "name": "Google Material"
+    },
+    {
+      "id": "polaris-friendly",
+      "name": "Shopify Polaris"
+    },
+    {
+      "id": "apple-glass",
+      "name": "Apple Glass"
+    },
+    {
+      "id": "brutalist-mono",
+      "name": "Brutalist Mono / Geist"
+    },
+    {
+      "id": "govuk-conservative",
+      "name": "GOV.UK Conservative"
+    },
+    {
+      "id": "porsche-precision",
+      "name": "Porsche Precision"
+    },
+    {
+      "id": "ant-china-enterprise",
+      "name": "Ant Design / China Enterprise"
+    },
+    {
+      "id": "marketing-gradient",
+      "name": "Marketing Gradient"
+    },
+    {
+      "id": "community-polished",
+      "name": "Community Polished"
+    }
+  ]
+}

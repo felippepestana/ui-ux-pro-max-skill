@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/felippepestana/ui-ux-pro-max-skill/blob/main/src/shared/schema/style-fingerprint.schema.json",
+  "title": "Style fingerprint",
+  "description": "Visual archetype classification emitted by design-md/lib/extractors.cjs (classifyStyle).",
+  "type": "object",
+  "required": ["classification"],
+  "properties": {
+    "extracted_signals":  { "type": "object" },
+    "classification": {
+      "type": "object",
+      "required": ["primary_archetype"],
+      "properties": {
+        "primary_archetype":   { "type": ["string", "null"] },
+        "secondary_archetype": { "type": ["string", "null"] },
+        "confidence_score":    { "type": "number" },
+        "explanation":         { "type": "string" }
+      }
+    },
+    "archetype_distance": { "type": "object" }
+  },
+  "additionalProperties": true
+}
